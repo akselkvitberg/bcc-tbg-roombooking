@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>Mine bookinger – desktop</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="/_blob/e895aa84635a929158b5e89483b2e1bb">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&amp;display=block">
+<style>
+body{margin:0}
+a{color:#0C625C}a:hover{color:#014D49}
+</style>
+</helmet>
+<div class="bcc-root {{themeCls}}" style="position: relative; min-height: 1240px; display: flex; flex-direction: column">
+<header class="topnav">
+<a class="appmark" href="Main.dc.html"><span class="mark"><span class="ms">meeting_room</span></span>Jarlsberg rombooking</a>
+<nav class="navlinks" aria-label="Hovedmeny">
+<a class="navlink" href="Main.dc.html"><span class="ms">add_circle</span>Book</a>
+<a class="navlink" href="Dagsoversikt.dc.html"><span class="ms">calendar_view_day</span>Dagsoversikt</a>
+<a class="navlink" href="Kart.dc.html"><span class="ms">map</span>Kart</a>
+<a class="navlink active" href="MineBookinger.dc.html" aria-current="page"><span class="ms">event_note</span>Mine bookinger<sc-if value="{{pending}}" hint-placeholder-val="{{ true }}"><span class="badge">1</span></sc-if></a>
+</nav>
+<div style="display: flex; align-items: center; gap: 12px"><span class="avatar" aria-hidden="true">IH</span><span style="display: flex; flex-direction: column; line-height: 1.2"><span style="font-weight: 500">Ingrid Hansen</span><span class="body-sm subtle">Ungdomsleder</span></span></div>
+</header>
+
+<main style="width: 100%; max-width: 1360px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+<h1 class="heading-2xl">Mine bookinger</h1>
+<a class="btn btn-primary" href="Main.dc.html"><span class="ms">add</span>Ny booking</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{tiles}}" as="t" hint-placeholder-count="4">
+<button onClick="{{t.pick}}" aria-pressed="{{t.pressed}}" class="card" style="text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; {{t.style}}">
+<span class="body-sm subtle" style="display: flex; align-items: center; gap: 6px"><span class="ms sm" style="color: {{t.color}}">{{t.icon}}</span>{{t.label}}</span>
+<span style="font-size: 28px; font-weight: 600; line-height: 34px">{{t.n}}</span>
+</button>
+</sc-for>
+</div>
+
+<sc-if value="{{pending}}" hint-placeholder-val="{{ true }}">
+<div class="card" style="border: 2px solid var(--blue); padding: 14px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px">
+<span class="ms" style="color: var(--blue-text); font-size: 28px">swap_horiz</span>
+<div style="flex: 1 1 380px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600">Forslag: Sal B i stedet for Hovedsalen, lør 10. okt 11:00–14:00</span>
+<span class="body-sm subtle">Ola Berg: Hovedsalen må rigges til konferanse. Svar innen fre 9. okt kl. 14:00 (18 t igjen). Tiden holdes ikke av.</span>
+</div>
+<button class="btn btn-secondary" onClick="{{decline}}">Avslå</button>
+<button class="btn btn-primary" onClick="{{accept}}"><span class="ms">check</span>Godta Sal B</button>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section aria-label="Bookinger" style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px">
+<div class="seg" role="group" aria-label="Visning"><sc-for list="{{views}}" as="v" hint-placeholder-count="2"><button class="{{v.cls}}" aria-pressed="{{v.pressed}}" onClick="{{v.pick}}"><span class="ms sm">{{v.icon}}</span>{{v.t}}</button></sc-for></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px" role="group" aria-label="Filtrer på type">
+<sc-for list="{{typeChips}}" as="c" hint-placeholder-count="6"><button onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" class="ttag {{c.cls}}"><sc-if value="{{c.hasIcon}}" hint-placeholder-val="{{ true }}"><span class="ms">{{c.icon}}</span></sc-if>{{c.t}}</button></sc-for>
+</div>
+</div>
+<sc-if value="{{hasFilter}}" hint-placeholder-val="{{ false }}"><div class="body-sm subtle" style="display: flex; align-items: center; gap: 6px"><span class="ms sm">filter_alt</span>{{filterTxt}}<button class="btn btn-sm btn-text" onClick="{{clearFilter}}">Vis alle</button></div></sc-if>
+
+<sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+<div class="card" style="overflow-x: auto">
+<table class="tbl" style="min-width: 680px">
+<thead><tr><th style="width: 110px">Dato</th><th style="width: 100px">Tid</th><th>Rom</th><th>Type og formål</th><th style="width: 170px">Status</th><th style="width: 90px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Handlinger</span></th></tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="10">
+<sc-if value="{{r.isWeek}}" hint-placeholder-val="{{ false }}"><tr><td colspan="6" style="background: var(--sunken); font-size: 12px; font-weight: 600; color: var(--text-subtle); padding: 6px 16px">{{r.week}}</td></tr></sc-if>
+<sc-if value="{{r.isRow}}" hint-placeholder-val="{{ true }}">
+<tr style="{{r.trStyle}}">
+<td style="font-weight: 500; white-space: nowrap; {{r.strike}}">{{r.date}}</td>
+<td style="white-space: nowrap; font-variant-numeric: tabular-nums; {{r.strike}}">{{r.time}}</td>
+<td style="{{r.strike}}">{{r.rooms}}<sc-if value="{{r.series}}" hint-placeholder-val="{{ false }}"><span class="ms sm subtle" style="vertical-align: -3px; margin-left: 4px" aria-label="Del av serie">repeat</span></sc-if></td>
+<td><span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span class="ttag {{r.typeCls}}"><span class="ms">{{r.typeIcon}}</span>{{r.typeName}}</span><span class="subtle" style="{{r.strike}}">{{r.purpose}}</span></span></td>
+<td><span class="tag {{r.stCls}}"><span class="ms">{{r.stIcon}}</span>{{r.st}}</span></td>
+<td><button class="btn btn-sm btn-text" aria-label="Åpne {{r.date}} {{r.rooms}}" onClick="{{r.open}}">Åpne<span class="ms sm">chevron_right</span></button></td>
+</tr>
+</sc-if>
+</sc-for>
+</tbody>
+</table>
+<sc-if value="{{noRows}}" hint-placeholder-val="{{ false }}"><div class="subtle" style="padding: 24px; text-align: center">Ingen bookinger med dette filteret.</div></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{isCal}}" hint-placeholder-val="{{ false }}">
+<div class="card" style="overflow: hidden">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border)"><span class="heading-sm">Oktober 2026</span><span style="display: flex"><button class="btn btn-icon btn-sm btn-text" aria-label="Forrige måned"><span class="ms">chevron_left</span></button><button class="btn btn-icon btn-sm btn-text" aria-label="Neste måned"><span class="ms">chevron_right</span></button></span></div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
+<sc-for list="{{wd}}" as="w" hint-placeholder-count="7"><div class="body-sm subtle" style="padding: 6px 8px; border-bottom: 1px solid var(--border); background: var(--sunken)">{{w}}</div></sc-for>
+<sc-for list="{{cal}}" as="c" hint-placeholder-count="35">
+<div style="min-height: 104px; padding: 4px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; {{c.style}}">
+<span style="font-size: 12px; font-weight: 500; padding: 2px 4px; {{c.numStyle}}">{{c.n}}</span>
+<sc-for list="{{c.items}}" as="i" hint-placeholder-count="1"><button class="tbar {{i.cls}}" style="{{i.strike}}" title="{{i.title}}" aria-label="{{i.title}}" onClick="{{i.open}}">{{i.t}}</button></sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</section>
+
+<aside aria-labelledby="s-h" style="flex: 1 1 340px; max-width: 400px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 class="heading-lg" id="s-h">Mine serier</h2><span class="body-sm subtle">Hopp over enkeltdatoer</span></div>
+<sc-for list="{{series}}" as="s" hint-placeholder-count="3">
+<div class="card" style="overflow: hidden; {{s.cardStyle}}">
+<button onClick="{{s.toggle}}" aria-expanded="{{s.expanded}}" style="width: 100%; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start">
+<span class="{{s.typeCls}}" style="width: 36px; height: 36px; border-radius: 8px; background: var(--sunken); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><span class="ms" style="font-size: 20px; color: var(--tc)">{{s.typeIcon}}</span></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{s.name}}</span><span class="body-sm subtle">{{s.pattern}}</span><span class="body-sm subtle">{{s.rooms}}</span></span>
+<span class="ms subtle">{{s.chev}}</span>
+</button>
+<sc-if value="{{s.open}}" hint-placeholder-val="{{ false }}">
+<div style="border-top: 1px solid var(--border)">
+<sc-for list="{{s.dates}}" as="d" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-bottom: 1px solid var(--border); font-size: 13px; {{d.rowStyle}}">
+<span style="flex: 1; {{d.textStyle}}">{{d.label}}<sc-if value="{{d.hasNote}}" hint-placeholder-val="{{ false }}"><span class="body-sm subtle" style="display: block">{{d.note}}</span></sc-if></span>
+<sc-if value="{{d.skipped}}" hint-placeholder-val="{{ false }}"><span class="tag">Hoppes over</span><button class="btn btn-sm btn-text" onClick="{{d.toggle}}">Angre</button></sc-if>
+<sc-if value="{{d.active}}" hint-placeholder-val="{{ true }}"><span class="tag {{d.stCls}}">{{d.st}}</span><button class="btn btn-sm btn-text" onClick="{{d.toggle}}">Hopp over</button></sc-if>
+</div>
+</sc-for>
+<div style="display: flex; gap: 8px; padding: 10px 16px; flex-wrap: wrap"><button class="btn btn-sm btn-secondary"><span class="ms sm">edit</span>Endre serien</button><button class="btn btn-sm btn-secondary"><span class="ms sm">add</span>Forleng</button><button class="btn btn-sm btn-danger-outline">Avslutt</button></div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+<div class="msg msg-info"><span class="ms">sms</span><span>Hopper du over en dato, frigjøres rommet med en gang, og du får én SMS-kvittering.</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px"><h2 class="heading-lg" id="tp-h">Mine maler</h2><a class="btn btn-sm btn-text" href="Main.dc.html"><span class="ms sm">add</span>Ny fra Book</a></div>
+<div class="card" aria-labelledby="tp-h">
+<sc-for list="{{tpls}}" as="t" hint-placeholder-count="3">
+<div class="row" style="padding: 10px 8px 10px 14px; gap: 10px">
+<span class="{{t.cls}}" style="width: 32px; height: 32px; border-radius: 8px; background: var(--sunken); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><span class="ms" style="color: var(--tc)">{{t.icon}}</span></span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-weight: 600">{{t.name}}</span><span class="body-sm subtle">{{t.desc}}</span></span>
+<a class="btn btn-sm btn-secondary" href="Main.dc.html">Bruk</a>
+<button class="btn btn-icon btn-sm btn-text" aria-label="Gi nytt navn til {{t.name}}"><span class="ms sm">edit</span></button>
+<button class="btn btn-icon btn-sm btn-text" aria-label="Slett malen {{t.name}}" onClick="{{t.remove}}"><span class="ms sm">delete</span></button>
+</div>
+</sc-for>
+<sc-if value="{{noTpl}}" hint-placeholder-val="{{ false }}"><div class="subtle" style="padding: 16px; text-align: center">Ingen maler. Huk av «Lagre som mal» når du booker.</div></sc-if>
+</div>
+</aside>
+</div>
+</main>
+
+<sc-if value="{{hasDrawer}}" hint-placeholder-val="{{ false }}">
+<div class="drawer-mask" onKeyDown="{{escDrawer}}">
+<div class="drawer" role="dialog" aria-modal="true" aria-labelledby="dr-h">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--border)"><h2 class="heading-lg" id="dr-h">{{drw.rooms}}</h2><button class="btn btn-icon btn-text" aria-label="Lukk" onClick="{{closeDrawer}}"><span class="ms">close</span></button></div>
+<div style="padding: 20px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><span class="ttag {{drw.typeCls}}"><span class="ms">{{drw.typeIcon}}</span>{{drw.typeName}}</span><span class="tag {{drw.stCls}}">{{drw.stName}}</span></div>
+<dl class="kv" style="font-size: 14px"><dt>Dato</dt><dd>{{drw.date}}</dd><dt>Tid</dt><dd>{{drw.time}}</dd><dt>Formål</dt><dd>{{drw.purpose}}</dd><sc-if value="{{drw.series}}" hint-placeholder-val="{{ false }}"><dt>Serie</dt><dd>{{drw.sname}} · {{drw.pattern}}</dd></sc-if></dl>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-if value="{{drw.canSkip}}" hint-placeholder-val="{{ false }}"><button class="btn btn-secondary" style="justify-content: flex-start" onClick="{{skipDrw}}"><span class="ms">event_busy</span>Hopp over denne datoen</button></sc-if>
+<sc-if value="{{drw.isSkipped}}" hint-placeholder-val="{{ false }}"><button class="btn btn-secondary" style="justify-content: flex-start" onClick="{{unskipDrw}}"><span class="ms">undo</span>Ta med denne datoen igjen</button></sc-if>
+<a class="btn btn-secondary" style="justify-content: flex-start" href="Main.dc.html"><span class="ms">schedule</span>Endre tid eller rom</a>
+<a class="btn btn-secondary" style="justify-content: flex-start" href="Main.dc.html"><span class="ms">content_copy</span>Dupliser til ny dato</a>
+<sc-if value="{{drw.notSkipped}}" hint-placeholder-val="{{ true }}"><button class="btn btn-danger-outline" style="justify-content: flex-start" onClick="{{cancelDrw}}"><span class="ms">delete</span>Avbestill denne datoen</button></sc-if>
+</div>
+<p class="body-sm subtle">Endringer frigjør rommet med en gang. Du får én SMS-kvittering. Romansvarlig varsles ikke når du avbestiller.</p>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+<div class="toast" role="status"><span class="ms fill" style="color: var(--green)">check_circle</span><div style="flex: 1"><strong>{{toast}}</strong></div><button class="btn btn-icon btn-sm btn-text" aria-label="Lukk melding" onClick="{{closeToast}}"><span class="ms">close</span></button></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1360,"height":1240}}'>
+var TYPES = { ungdom: ['Ungdom', 'groups', 'tt-ungdom'], mote: ['Møte', 'forum', 'tt-mote'], ovelse: ['Øvelse', 'music_note', 'tt-ovelse'], dugnad: ['Dugnad', 'construction', 'tt-dugnad'], arr: ['Arrangement', 'celebration', 'tt-arr'], annet: ['Annet', 'label', 'tt-annet'] };
+var WDN = ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'];
+function wdOf(m, d) { return ((m === 10 ? d + 31 : d) + 2) % 7; }
+function lab(m, d) { return WDN[wdOf(m, d)] + ' ' + d + '. ' + (m === 10 ? 'nov' : 'okt'); }
+function weekOf(m, d) { return 41 + Math.floor(((m === 10 ? d + 31 : d) - 5) / 7); }
+var SERIES = [
+  { id: 'kor', name: 'Korøvelse', type: 'ovelse', rooms: 'Sal B', time: '19:00–21:00', pattern: 'Hver torsdag 19:00–21:00 · til 10. des', purpose: 'Korøvelse, sopranene', dates: [[9, 8], [9, 15], [9, 22], [9, 29], [10, 5]] },
+  { id: 'ung', name: 'Ungdomskveld', type: 'ungdom', rooms: 'AK-salen + Ungdomskafeen', time: '17:00–22:00', pattern: 'Hver fredag 17:00–22:00 · 8 ganger', purpose: 'Ungdomskveld med lovsang og kafé', dates: [[9, 9], [9, 16], [9, 23], [9, 30], [10, 6]], pend: true, conflict: '9-23', note: { '9-23': 'Konflikt: Høstkonferanse til 19:00', '9-30': 'Høstferie' } },
+  { id: 'dug', name: 'Dugnad', type: 'dugnad', rooms: 'Hele AK-bygget', time: '10:00–15:00', pattern: 'Annenhver lørdag 10:00–15:00 · 6 ganger', purpose: 'Dugnad – vask og vedlikehold', dates: [[9, 17], [9, 31], [10, 14], [10, 28]], note: { '9-31': 'Ingen dugnad denne uka' } }
+];
+var SINGLES = [
+  { m: 9, d: 8, time: '17:00–18:30', rooms: 'Kjøkkenet', type: 'annet', purpose: 'Forberede kirkekaffe', st: 'pend' },
+  { m: 9, d: 15, time: '18:00–19:30', rooms: 'Grupperom 1', type: 'mote', purpose: 'Bibelgruppe for unge voksne', st: 'ok' },
+  { m: 9, d: 20, time: '18:00–22:00', rooms: 'Ungdomskafeen', type: 'ungdom', purpose: 'Spillkveld for 13–15 år', st: 'ok' },
+  { m: 9, d: 27, time: '19:00–21:00', rooms: 'Møterom AK1', type: 'mote', purpose: 'Ledermøte ungdomsarbeidet', st: 'ok' }
+];
+var TPLM = { 'Ungdomskveld': ['ungdom', 0, 'AK-salen + Ungdomskafeen · fredager 17–22'], 'Korøvelse': ['ovelse', 0, 'Sal B · torsdager 19–21'], 'Dugnad': ['dugnad', 0, 'Hele AK-bygget · annenhver lørdag 10–15'] };
+var STM = { ok: ['Bekreftet', 'tag-success', 'check_circle'], pend: ['Venter på svar', 'tag-warning', 'hourglass_top'], conf: ['Venter på svar · konflikt', 'tag-warning', 'warning'], skip: ['Hoppet over', '', 'event_busy'] };
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { view: 'list', type: 'all', tile: null, open: 'dug', skip: { 'ung-9-30': true, 'dug-9-31': true }, pending: true, extra: [], toast: null, drawer: null, gone: {}, tpls: ['Ungdomskveld', 'Korøvelse', 'Dugnad'] }; }
+  renderVals() {
+    var self = this, st = this.state;
+    var all = [];
+    SERIES.forEach(function (s) {
+      s.dates.forEach(function (md) {
+        var key = md[0] + '-' + md[1], skipped = !!st.skip[s.id + '-' + key];
+        var status = skipped ? 'skip' : (s.conflict === key ? 'conf' : (s.pend ? 'pend' : 'ok'));
+        all.push({ id: s.id + '-' + key, key: key, m: md[0], d: md[1], time: s.time, rooms: s.rooms, type: s.type, purpose: s.purpose, st: status, series: true, sid: s.id, sname: s.name, pattern: s.pattern });
+      });
+    });
+    SINGLES.concat(st.extra).forEach(function (b) { all.push(Object.assign({ series: false, id: 'x' + b.m + '-' + b.d + b.rooms }, b)); });
+    all = all.filter(function (b) { return !st.gone[b.id]; });
+    all.sort(function (a, b) { return (a.m * 40 + a.d) - (b.m * 40 + b.d) || a.time.localeCompare(b.time); });
+    var inRange = all.filter(function (b) { return b.m === 9; });
+    var counts = { pend: inRange.filter(function (b) { return b.st === 'pend' || b.st === 'conf'; }).length, up: inRange.filter(function (b) { return b.st !== 'skip'; }).length };
+    var filtered = inRange.filter(function (b) {
+      if (st.type !== 'all' && b.type !== st.type) return false;
+      if (st.tile === 'pend' && !(b.st === 'pend' || b.st === 'conf')) return false;
+      if (st.tile === 'series' && !b.series) return false;
+      if (st.tile === 'up' && b.st === 'skip') return false;
+      if (st.tile === 'answer') return false;
+      return true;
+    });
+    var rows = [], lastW = null;
+    filtered.forEach(function (b) {
+      var w = weekOf(b.m, b.d);
+      if (w !== lastW) { rows.push({ isWeek: true, isRow: false, week: 'Uke ' + w + (w === 41 ? ' · denne uka' : '') }); lastW = w; }
+      var t = TYPES[b.type], s = STM[b.st], sk = b.st === 'skip';
+      rows.push({ isWeek: false, isRow: true, date: lab(b.m, b.d), time: b.time, rooms: b.rooms, series: b.series, purpose: b.purpose,
+        typeName: t[0], typeIcon: t[1], typeCls: t[2], st: s[0], stCls: s[1], stIcon: s[2], open: function () { self.setState({ drawer: b }); },
+        strike: sk ? 'text-decoration: line-through; color: var(--text-subtle)' : '', trStyle: sk ? 'background: var(--sunken)' : '' });
+    });
+    var cal = [];
+    for (var i = 0; i < 35; i++) {
+      (function (dd) {
+        var inM = dd >= 1 && dd <= 31;
+        var items = inM ? all.filter(function (b) { return b.m === 9 && b.d === dd && (st.type === 'all' || b.type === st.type); }).map(function (b) {
+          var t = TYPES[b.type]; return { t: b.time.slice(0, 5) + ' ' + b.rooms, cls: t[2], title: t[0] + ': ' + b.purpose + ', ' + b.rooms + ' ' + b.time, strike: b.st === 'skip' ? 'text-decoration: line-through; opacity: .6' : '', open: function () { self.setState({ drawer: b }); } };
+        }) : [];
+        cal.push({ n: inM ? dd : (dd < 1 ? 30 + dd : dd - 31), items: items, style: inM ? '' : 'background: var(--sunken)', numStyle: dd === 8 ? 'background: var(--brand); color: var(--on-brand); border-radius: 4px; align-self: flex-start' : (inM ? '' : 'color: var(--text-subtle)') });
+      })(i - 2);
+    }
+    var drw = st.drawer ? all.filter(function (b) { return b.id === st.drawer.id; })[0] : null;
+    var tileDefs = [['pend', 'Venter på svar', 'hourglass_top', 'var(--yellow)', counts.pend], ['up', 'Kommende i oktober', 'event_upcoming', 'var(--brand)', counts.up], ['series', 'Aktive serier', 'repeat', 'var(--purple-text)', SERIES.length], ['answer', 'Trenger ditt svar', 'forum', 'var(--blue)', st.pending ? 1 : 0]];
+    var typeKeys = ['all', 'ungdom', 'ovelse', 'dugnad', 'mote', 'arr', 'annet'];
+    return {
+      themeCls: this.props.dark ? 'dark' : '', pending: st.pending,
+      tiles: tileDefs.map(function (t) { var on = st.tile === t[0]; return { label: t[1], icon: t[2], color: t[3], n: t[4], pressed: on ? 'true' : 'false',
+        style: on ? 'border-color: var(--brand); box-shadow: inset 0 0 0 1px var(--brand)' : '', pick: function () { self.setState({ tile: on ? null : t[0] }); } }; }),
+      views: [['list', 'Liste', 'view_list'], ['cal', 'Kalender', 'calendar_month']].map(function (v) { return { t: v[1], icon: v[2], cls: st.view === v[0] ? 'on' : '', pressed: st.view === v[0] ? 'true' : 'false', pick: function () { self.setState({ view: v[0] }); } }; }),
+      isList: st.view === 'list', isCal: st.view === 'cal',
+      typeChips: typeKeys.map(function (k) { var on = st.type === k, t = TYPES[k]; return { t: k === 'all' ? 'Alle typer' : t[0], icon: t ? t[1] : '', hasIcon: !!t, cls: t ? t[2] : 'tt-mote', pressed: on ? 'true' : 'false', pick: function () { self.setState({ type: k }); } }; }),
+      hasFilter: st.type !== 'all' || !!st.tile, filterTxt: st.tile === 'answer' ? 'Viser bare det som trenger ditt svar (forslaget over)' : 'Viser ' + filtered.length + ' av ' + inRange.length + ' bookinger i oktober', clearFilter: function () { self.setState({ type: 'all', tile: null }); },
+      rows: rows, noRows: filtered.length === 0, wd: ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'], cal: cal,
+      series: SERIES.map(function (s) {
+        var open = st.open === s.id, t = TYPES[s.type];
+        return { name: s.name, pattern: s.pattern, rooms: s.rooms, typeIcon: t[1], typeCls: t[2], open: open, expanded: open ? 'true' : 'false', chev: open ? 'expand_less' : 'expand_more',
+          cardStyle: open ? 'box-shadow: var(--shadow)' : '', toggle: function () { self.setState({ open: open ? null : s.id }); },
+          dates: s.dates.map(function (md) {
+            var key = md[0] + '-' + md[1], sk = !!st.skip[s.id + '-' + key], note = (s.note || {})[key] || '';
+            var stt = s.conflict === key ? STM.conf : (s.pend ? STM.pend : STM.ok);
+            return { label: lab(md[0], md[1]), note: note, hasNote: !!note, skipped: sk, active: !sk, st: stt[0], stCls: stt[1],
+              rowStyle: sk ? 'background: var(--sunken)' : '', textStyle: sk ? 'text-decoration: line-through; color: var(--text-subtle)' : '',
+              toggle: function () { var x = Object.assign({}, st.skip); x[s.id + '-' + key] = !sk; self.setState({ skip: x, toast: sk ? lab(md[0], md[1]) + ' er tatt med igjen' : lab(md[0], md[1]) + ' hoppes over – rommet er frigjort' }); } };
+          }) };
+      }),
+      hasDrawer: !!drw, drw: drw ? Object.assign({}, drw, { typeName: TYPES[drw.type][0], typeIcon: TYPES[drw.type][1], typeCls: TYPES[drw.type][2], date: lab(drw.m, drw.d), stName: STM[drw.st][0], stCls: STM[drw.st][1], series: !!drw.series, canSkip: !!drw.series && drw.st !== 'skip', isSkipped: drw.st === 'skip', notSkipped: drw.st !== 'skip' }) : {},
+      closeDrawer: function () { self.setState({ drawer: null }); }, escDrawer: function (e) { if (e.key === 'Escape') self.setState({ drawer: null }); },
+      skipDrw: function () { var x = Object.assign({}, st.skip); x[drw.sid + '-' + drw.key] = true; self.setState({ skip: x, drawer: null, toast: lab(drw.m, drw.d) + ' hoppes over – rommet er frigjort' }); },
+      unskipDrw: function () { var x = Object.assign({}, st.skip); x[drw.sid + '-' + drw.key] = false; self.setState({ skip: x, drawer: null, toast: lab(drw.m, drw.d) + ' er tatt med igjen' }); },
+      cancelDrw: function () { var g = Object.assign({}, st.gone); g[drw.id] = true; self.setState({ gone: g, drawer: null, toast: 'Avbestilt – du får en SMS-kvittering' }); },
+      tpls: st.tpls.map(function (n) { var m = TPLM[n]; return { name: n, desc: m[2], icon: TYPES[m[0]][1], cls: TYPES[m[0]][2], remove: function () { self.setState({ tpls: st.tpls.filter(function (q) { return q !== n; }), toast: 'Malen «' + n + '» er slettet' }); } }; }),
+      noTpl: st.tpls.length === 0,
+      accept: function () { self.setState({ pending: false, extra: [{ m: 9, d: 10, time: '11:00–14:00', rooms: 'Sal B', type: 'arr', purpose: 'Bursdagsfeiring for menigheten', st: 'ok' }], toast: 'Sal B lørdag 10. okt er bekreftet' }); },
+      decline: function () { self.setState({ pending: false, toast: 'Forslaget er avslått' }); },
+      hasToast: !!st.toast, toast: st.toast || '', closeToast: function () { self.setState({ toast: null }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

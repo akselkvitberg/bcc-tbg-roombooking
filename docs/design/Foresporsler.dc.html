@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>Forespørsler – romansvarlig</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="/_blob/e895aa84635a929158b5e89483b2e1bb">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&amp;display=block">
+<style>
+body{margin:0}
+a{color:#0C625C}a:hover{color:#014D49}
+</style>
+</helmet>
+<div class="bcc-root {{themeCls}}" style="position: relative; min-height: 1500px; display: flex; flex-direction: column">
+<header class="topnav">
+<a class="appmark" href="Main.dc.html"><span class="mark"><span class="ms">meeting_room</span></span>Jarlsberg rombooking</a>
+<nav class="navlinks" aria-label="Hovedmeny">
+<a class="navlink" href="Main.dc.html"><span class="ms">add_circle</span>Book</a>
+<a class="navlink" href="MineBookinger.dc.html"><span class="ms">event_note</span>Mine bookinger</a>
+<span aria-hidden="true" style="width: 1px; height: 24px; background: var(--border); align-self: center; margin: 0 6px"></span>
+<span class="label-sm subtle" style="align-self: center; margin-right: 2px">ADMINISTRASJON</span>
+<a class="navlink active" href="Foresporsler.dc.html" aria-current="page"><span class="ms">inbox</span>Forespørsler<span class="badge">{{count}}</span></a>
+<a class="navlink" href="Oversikt.dc.html"><span class="ms">view_timeline</span>Alle bookinger</a>
+<a class="navlink {{navRom}}" href="Rom.dc.html"><span class="ms">tune</span>Rom og tilgang</a>
+<a class="navlink" href="Rom.dc.html"><span class="ms">sms</span>SMS-logg</a>
+</nav>
+<div style="display: flex; align-items: center; gap: 12px"><span class="tag tag-brand">Romansvarlig</span><span class="avatar" aria-hidden="true" style="background: #98afb0">OB</span><span style="font-weight: 500">Ola Berg</span></div>
+</header>
+
+<main style="width: 100%; max-width: 1360px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 4px"><h1 class="heading-2xl">Forespørsler</h1><p class="subtle">Fra i dag og fremover. Konflikter først, eldste først i hver gruppe.</p></div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<nav aria-label="Forespørsler" style="flex: 1 1 340px; max-width: 400px; display: flex; flex-direction: column; gap: 20px">
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+<section style="display: flex; flex-direction: column; gap: 8px">
+<h2 class="label-sm subtle" style="display: flex; align-items: center; gap: 6px; text-transform: uppercase"><span class="ms sm">{{g.icon}}</span>{{g.title}} <span>({{g.n}})</span></h2>
+<sc-for list="{{g.items}}" as="it" hint-placeholder-count="2">
+<button onClick="{{it.pick}}" aria-current="{{it.cur}}" style="text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 12px 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px; {{it.style}}">
+<span style="display: flex; justify-content: space-between; gap: 8px"><span style="font-weight: 600">{{it.room}}</span><span class="tag {{it.tagCls}}">{{it.tag}}</span></span>
+<span style="font-size: 13px">{{it.when}}</span>
+<span style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap"><span class="ttag {{it.tyCls}}" style="height: 22px"><span class="ms">{{it.tyIcon}}</span>{{it.tyName}}</span><span class="body-sm subtle">{{it.who}} · {{it.purpose}}</span></span>
+</button>
+</sc-for>
+</section>
+</sc-for>
+<sc-if value="{{empty}}" hint-placeholder-val="{{ false }}"><div class="card" style="padding: 32px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px"><span class="ms" style="font-size: 32px; color: var(--green)">task_alt</span><span class="heading-sm">Ingen forespørsler venter</span></div></sc-if>
+</nav>
+
+<sc-if value="{{hasSel}}" hint-placeholder-val="{{ true }}">
+<section class="card" aria-labelledby="det-t" style="flex: 999 1 560px; min-width: 0; overflow: hidden">
+<div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-start">
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; gap: 6px; flex-wrap: wrap"><span class="tag {{sel.tagCls}}"><span class="ms">{{sel.tagIcon}}</span>{{sel.tag}}</span><span class="ttag {{sel.tyCls}}"><span class="ms">{{sel.tyIcon}}</span>{{sel.tyName}}</span></span><h2 class="heading-xl" id="det-t">{{sel.room}} · {{sel.when}}</h2><span class="subtle">Sendt {{sel.sent}}</span></div>
+</div>
+
+<sc-if value="{{isConflict}}" hint-placeholder-val="{{ true }}">
+<div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="border-radius: 8px; border: 2px solid var(--yellow); padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span class="label-sm" style="color: var(--yellow-text); display: flex; gap: 6px; align-items: center"><span class="ms sm">schedule</span>NY FORESPØRSEL</span>
+<dl class="kv"><dt>Navn</dt><dd style="font-weight: 600">{{sel.who}}</dd><dt>Tid</dt><dd>{{sel.time}}</dd><dt>Formål</dt><dd>{{sel.purpose}}</dd><dt>Personer</dt><dd>{{sel.people}}</dd><dt>Mobil</dt><dd>{{sel.phone}}</dd></dl>
+</div>
+<div style="border-radius: 8px; border: 1px solid var(--border-strong); background: var(--sunken); padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span class="label-sm subtle" style="display: flex; gap: 6px; align-items: center"><span class="ms sm">{{sel.exIcon}}</span>{{sel.exLabel}}</span>
+<dl class="kv"><dt>Navn</dt><dd style="font-weight: 600">{{sel.exWho}}</dd><dt>Tid</dt><dd>{{sel.exTime}}</dd><dt>Formål</dt><dd>{{sel.exPurpose}}</dd><dt>Personer</dt><dd>{{sel.exPeople}}</dd><dt>Mobil</dt><dd>{{sel.exPhone}}</dd></dl>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px"><h3 class="heading-sm">Ledige rom med plass, samme tid</h3>
+<sc-for list="{{sel.freeRooms}}" as="r" hint-placeholder-count="2"><div class="card" style="padding: 10px 12px; display: flex; align-items: center; gap: 10px"><span class="ms" style="color: var(--green)">meeting_room</span><span style="flex: 1"><strong style="font-weight: 600">{{r.n}}</strong> <span class="subtle">· maks {{r.c}}</span></span><button class="btn btn-sm btn-text" onClick="{{openPropose}}">Foreslå</button></div></sc-for></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><h3 class="heading-sm">Eksisterende kan flyttes til</h3>
+<sc-for list="{{sel.moveRooms}}" as="r" hint-placeholder-count="1"><div class="card" style="padding: 10px 12px; display: flex; align-items: center; gap: 10px"><span class="ms" style="color: var(--blue)">move_down</span><span style="flex: 1"><strong style="font-weight: 600">{{r.n}}</strong> <span class="subtle">· maks {{r.c}}</span></span><button class="btn btn-sm btn-text" onClick="{{act}}">Flytt og godkjenn</button></div></sc-for></div>
+</div>
+<div class="msg msg-info"><span class="ms">info</span><span>Godkjenner du denne, blir andre forespørsler på samme tid til konflikter.</span></div>
+</div>
+<div style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 8px">
+<button class="btn btn-primary" onClick="{{openPropose}}"><span class="ms">swap_horiz</span>Foreslå annet rom/tid</button>
+<button class="btn btn-secondary" onClick="{{act}}"><span class="ms">move_down</span>Flytt eksisterende og godkjenn</button>
+<button class="btn btn-secondary" onClick="{{openReason}}">Godkjenn og avbestill eksisterende</button>
+<span style="flex: 1"></span>
+<button class="btn btn-danger-outline" onClick="{{openDecline}}">Avslå</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isPart}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<dl class="kv" style="font-size: 14px"><dt>Navn</dt><dd style="font-weight: 600">{{sel.who}}</dd><dt>Tid</dt><dd>{{sel.time}}</dd><dt>Formål</dt><dd>{{sel.purpose}}</dd><dt>Personer</dt><dd>{{sel.people}}</dd><dt>Mobil</dt><dd>{{sel.phone}}</dd></dl>
+<div class="card" style="overflow: hidden"><table class="tbl"><thead><tr><th>Rom i delen</th><th>Status i perioden</th></tr></thead><tbody>
+<sc-for list="{{sel.partRooms}}" as="x" hint-placeholder-count="6"><tr><td style="font-weight: 500">{{x.n}}</td><td><span class="tag {{x.cls}}"><span class="ms">{{x.icon}}</span>{{x.st}}</span><sc-if value="{{x.hasNote}}" hint-placeholder-val="{{ false }}"><div class="body-sm subtle" style="margin-top: 4px">{{x.note}}</div></sc-if></td></tr></sc-for>
+</tbody></table></div>
+<div class="msg msg-info"><span class="ms">info</span><span>Godkjenner du hele delen, blir alle rommene reservert. Rom som er opptatt kan du ta med ved å flytte den eksisterende bookingen, eller godkjenne bare de ledige rommene.</span></div>
+</div>
+<div style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 8px">
+<button class="btn btn-primary" onClick="{{act}}"><span class="ms">done_all</span>Godkjenn ledige rom (5)</button>
+<button class="btn btn-secondary" onClick="{{act}}"><span class="ms">move_down</span>Flytt Diakoniutvalget og godkjenn alt</button>
+<button class="btn btn-secondary" onClick="{{openPropose}}"><span class="ms">swap_horiz</span>Foreslå annen tid</button>
+<span style="flex: 1"></span>
+<button class="btn btn-danger-outline" onClick="{{openDecline}}">Avslå</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isSeries}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<dl class="kv"><dt>Navn</dt><dd style="font-weight: 600">{{sel.who}}</dd><dt>Gjentakelse</dt><dd>{{sel.time}}</dd><dt>Formål</dt><dd>{{sel.purpose}}</dd><dt>Personer</dt><dd>{{sel.people}}</dd></dl>
+<div class="card" style="overflow: hidden"><table class="tbl"><thead><tr><th>Dato</th><th>Status</th><th style="text-align: right">Handling</th></tr></thead><tbody>
+<sc-for list="{{sel.dates}}" as="x" hint-placeholder-count="6"><tr><td>{{x.d}}</td><td><span class="tag {{x.cls}}"><span class="ms">{{x.icon}}</span>{{x.st}}</span><sc-if value="{{x.hasNote}}" hint-placeholder-val="{{ false }}"><div class="body-sm subtle" style="margin-top: 4px">{{x.note}}</div></sc-if></td><td style="text-align: right; white-space: nowrap"><button class="btn btn-sm btn-text">Godkjenn</button><button class="btn btn-sm btn-text" style="color: var(--red-text)">Avslå</button></td></tr></sc-for>
+</tbody></table></div>
+<p class="body-sm subtle"><span class="ms sm" style="vertical-align: -3px">sms</span> Beslutninger på enkeltdatoer samles i én SMS når ingen datoer venter lenger.</p>
+</div>
+<div style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 8px">
+<button class="btn btn-primary" onClick="{{act}}"><span class="ms">done_all</span>Godkjenn alle ledige ({{sel.freeN}})</button>
+<button class="btn btn-secondary" onClick="{{openDecline}}">Avslå resten ({{sel.restN}})</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isPlain}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<dl class="kv" style="font-size: 14px"><dt>Navn</dt><dd style="font-weight: 600">{{sel.who}}</dd><dt>Tid</dt><dd>{{sel.time}}</dd><dt>Formål</dt><dd>{{sel.purpose}}</dd><dt>Personer</dt><dd>{{sel.people}}</dd><dt>Mobil</dt><dd>{{sel.phone}}</dd></dl>
+<div class="msg msg-success"><span class="ms">check_circle</span><span>Tiden er ledig. Rommet krever manuell godkjenning.</span></div>
+</div>
+<div style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 8px">
+<button class="btn btn-primary" onClick="{{act}}"><span class="ms">check</span>Godkjenn</button>
+<button class="btn btn-secondary" onClick="{{openPropose}}"><span class="ms">swap_horiz</span>Foreslå annet rom/tid</button>
+<span style="flex: 1"></span>
+<button class="btn btn-danger-outline" onClick="{{openDecline}}">Avslå</button>
+</div>
+</sc-if>
+</section>
+</sc-if>
+</div>
+</main>
+
+<sc-if value="{{dlgDecline}}" hint-placeholder-val="{{ false }}">
+<div class="mask" onKeyDown="{{escClose}}"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dd-t" style="max-width: 480px">
+<div class="dialog-head"><h2 class="heading-lg" id="dd-t">{{dlgTitle}}</h2><button class="btn btn-icon btn-text" aria-label="Lukk" onClick="{{close}}"><span class="ms">close</span></button></div>
+<div class="dialog-body">
+<div class="field"><label for="why">Begrunnelse (sendes på SMS til {{sel.who}})</label><textarea id="why" rows="4" placeholder="F.eks. Rommet er satt av til rigging denne dagen."></textarea><span class="hint">Påkrevd</span></div>
+<div class="card" style="padding: 12px 14px; background: var(--sunken); font-size: 13px"><span class="label-sm subtle">SMS-FORHÅNDSVISNING</span><p style="margin-top: 4px">Rombooking: Forespørselen din om {{sel.room}} {{sel.when}} er avslått. Begrunnelse: …</p></div>
+</div>
+<div class="dialog-foot"><button class="btn btn-secondary" onClick="{{close}}">Avbryt</button><button class="btn btn-danger" onClick="{{act}}">{{dlgCta}}</button></div>
+</div></div>
+</sc-if>
+
+<sc-if value="{{dlgPropose}}" hint-placeholder-val="{{ false }}">
+<div class="mask" onKeyDown="{{escClose}}"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dp-t">
+<div class="dialog-head"><h2 class="heading-lg" id="dp-t">Foreslå annet rom eller tid</h2><button class="btn btn-icon btn-text" aria-label="Lukk" onClick="{{close}}"><span class="ms">close</span></button></div>
+<div class="dialog-body">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div class="field" style="grid-column: span 3"><label for="pr">Rom</label><select id="pr"><option>AK-salen (maks 150) – ledig</option></select></div>
+<div class="field"><label for="pd">Dato</label><div class="inputlike" id="pd">{{sel.dateShort}}</div></div>
+<div class="field"><label for="ps">Fra</label><select id="ps"><option>{{sel.from}}</option></select></div>
+<div class="field"><label for="pe">Til</label><select id="pe"><option>{{sel.to}}</option></select></div>
+</div>
+<div class="field"><span style="font-size: 13px; font-weight: 500">Svarfrist</span><div class="seg" role="group" aria-label="Svarfrist">
+<sc-for list="{{deadlines}}" as="o" hint-placeholder-count="3"><button class="{{o.cls}}" aria-pressed="{{o.pressed}}" onClick="{{o.pick}}">{{o.t}}</button></sc-for>
+</div><span class="hint">Medlemmet må svare innen {{deadlineTxt}}. Tiden holdes ikke av før de svarer.</span></div>
+<div class="field"><label for="pm">Melding til medlemmet</label><textarea id="pm" rows="3">Sal A er brukt av en konferanse til kl. 19. AK-salen er ledig hele kvelden.</textarea></div>
+</div>
+<div class="dialog-foot"><button class="btn btn-secondary" onClick="{{close}}">Avbryt</button><button class="btn btn-primary" onClick="{{act}}"><span class="ms">send</span>Send forslag</button></div>
+</div></div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+<div class="toast" role="status"><span class="ms fill" style="color: var(--green)">check_circle</span><div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><strong>{{toast.title}}</strong><span class="subtle">{{toast.text}}</span></div><button class="btn btn-icon btn-sm btn-text" aria-label="Lukk melding" onClick="{{closeToast}}"><span class="ms">close</span></button></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1360,"height":1500}}'>
+var ITEMS = [
+  { id: 'c1', kind: 'conflict', room: 'Sal A', when: 'fre 9. okt, 18:00–22:00', dateShort: '09.10.2026', from: '18:00', to: '22:00', sent: 'i går kl. 21:14', who: 'Jonas Aas', purpose: 'Ungdomskveld med lovsang', people: 90, phone: '+47 934 55 210', time: '18:00–22:00',
+    exIcon: 'business_center', exLabel: 'KONFERANSE (BEKREFTET)', exWho: 'Norsk Energiforum', exTime: '08:30–19:00 (middag til 19:00)', exPurpose: 'Parallellsesjon og middag', exPeople: 110, exPhone: 'Hilde Sætre, konferanseavdelingen',
+    freeRooms: [{ n: 'AK-salen', c: 150 }, { n: 'Hovedsalen', c: 500 }], moveRooms: [] },
+  { id: 'c2', kind: 'conflict', room: 'Kjøkkenet', when: 'tor 8. okt, 17:00–18:30', dateShort: '08.10.2026', from: '17:00', to: '18:30', sent: 'i dag kl. 09:02', who: 'Ingrid Hansen', purpose: 'Forberede kirkekaffe til søndag', people: 4, phone: '+47 912 34 567', time: '17:00–18:30',
+    exIcon: 'check_circle', exLabel: 'GODKJENT BOOKING', exWho: 'Per Lie', exTime: '15:00–18:00', exPurpose: 'Matlaging til seniortreff', exPeople: 6, exPhone: '+47 905 11 642',
+    freeRooms: [{ n: 'Kafeen (kjøkkenkrok)', c: 60 }], moveRooms: [{ n: 'Kafeen (kjøkkenkrok)', c: 60 }] },
+  { id: 'h1', kind: 'part', room: 'Hele AK-bygget', when: 'lør 17. okt, 10:00–23:00', dateShort: '17.10.2026', from: '10:00', to: '23:00', sent: '7. okt kl. 22:03', who: 'Emil Sand', purpose: 'Ungdomshelg – aktiviteter, kafé og konsert', people: 120, phone: '+47 469 15 283', time: '10:00–23:00',
+    rooms: [['AK-salen', 'f'], ['Ungdomskafeen', 'f'], ['Kjøkkenet', 'f', 'Begrenset rom – Emil har ikke tilgang'], ['Møterom AK1', 'c', 'Opptatt 10:00–12:00: Diakoniutvalget (Nina Berg)'], ['Møterom AK2', 'f'], ['Studio', 'f', 'Begrenset rom']] },
+  { id: 's1', kind: 'series', room: 'Grupperom 1', when: 'torsdager 18:00–19:30', sent: '6. okt kl. 20:40', who: 'Ingrid Hansen', purpose: 'Bibelgruppe for unge voksne', people: 9, time: 'Ukentlig, 15. okt – 10. des (10 datoer, 7 allerede bekreftet)', freeN: 0, restN: 2,
+    dates: [['Tor 22. okt', 'c', 'Overlapper: Konferanse Vestfold Skoleforum til 19:00'], ['Tor 12. nov', 'c', 'Overlapper: Kurs i førstehjelp, 18:00–21:00']] },
+  { id: 's2', kind: 'series', room: 'Sal B', when: 'annenhver lørdag 10:00–11:30', sent: '5. okt kl. 12:10', who: 'Maria Johansen', purpose: 'Babysang', people: 30, time: 'Annenhver uke, 17. okt – 23. jan (8 datoer)', freeN: 7, restN: 1,
+    dates: [['Lør 17. okt', 'f'], ['Lør 31. okt', 'f'], ['Lør 14. nov', 'c', 'Overlapper: Konferanse, helgeseminar'], ['Lør 28. nov', 'f'], ['Lør 12. des', 'f'], ['Lør 26. des', 'f'], ['Lør 9. jan', 'f'], ['Lør 23. jan', 'f']] },
+  { id: 'p1', kind: 'plain', room: 'Studio', when: 'fre 9. okt, 10:00–12:00', dateShort: '09.10.2026', from: '10:00', to: '12:00', sent: '7. okt kl. 08:15', who: 'Markus Dahl', purpose: 'Innspilling av invitasjon til julekonsert', people: 3, phone: '+47 977 20 118', time: '10:00–12:00' },
+  { id: 'p2', kind: 'plain', room: 'AK-salen', when: 'søn 18. okt, 12:00–16:00', dateShort: '18.10.2026', from: '12:00', to: '16:00', sent: '7. okt kl. 19:52', who: 'Sara Nilsen', purpose: 'Konfirmantsamling', people: 60, phone: '+47 458 61 903', time: '12:00–16:00' }
+];
+var TY = { ungdom: ['Ungdom', 'groups'], mote: ['Møte', 'forum'], ovelse: ['Øvelse', 'music_note'], dugnad: ['Dugnad', 'construction'], arr: ['Arrangement', 'celebration'], annet: ['Annet', 'label'] };
+var TYPEOF = { c1: 'ungdom', c2: 'annet', h1: 'ungdom', s1: 'mote', s2: 'arr', p1: 'ovelse', p2: 'ungdom' };
+var G = [['conflict', 'Konflikter', 'warning', 'tag-warning', 'Konflikt'], ['part', 'Hele deler', 'select_all', 'tag-brand', 'Hel del'], ['series', 'Serier', 'repeat', 'tag-accent', 'Serie'], ['plain', 'Til godkjenning', 'how_to_reg', 'tag-info', 'Ledig']];
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { sel: 'c1', done: {}, dlg: null, dl: 1, toast: null }; }
+  renderVals() {
+    var self = this, st = this.state;
+    var live = ITEMS.filter(function (i) { return !st.done[i.id]; });
+    var sel = live.filter(function (i) { return i.id === st.sel; })[0] || live[0];
+    var groups = G.map(function (g) {
+      var items = live.filter(function (i) { return i.kind === g[0]; }).map(function (i) {
+        var on = sel && i.id === sel.id;
+        var ty = TYPEOF[i.id] || 'annet';
+        return { room: i.room, when: i.when, who: i.who, purpose: i.purpose, tag: g[4], tagCls: g[3], cur: on ? 'true' : 'false', tyName: TY[ty][0], tyIcon: TY[ty][1], tyCls: 'tt-' + ty,
+          style: on ? 'background: var(--brand-soft); border: 1px solid var(--brand)' : 'background: var(--surface); border: 1px solid var(--border)',
+          pick: function () { self.setState({ sel: i.id }); } };
+      });
+      return { title: g[1], icon: g[2], n: items.length, items: items };
+    }).filter(function (g) { return g.n > 0; });
+    var gm = sel ? G.filter(function (g) { return g[0] === sel.kind; })[0] : G[0];
+    var S = sel ? Object.assign({}, sel, {
+      tag: gm[4], tagCls: gm[3], tagIcon: gm[2], tyName: TY[TYPEOF[sel.id] || 'annet'][0], tyIcon: TY[TYPEOF[sel.id] || 'annet'][1], tyCls: 'tt-' + (TYPEOF[sel.id] || 'annet'),
+      partRooms: (sel.rooms || []).map(function (x) { var c = x[1] === 'c'; return { n: x[0], st: c ? 'Opptatt' : 'Ledig', cls: c ? 'tag-warning' : 'tag-success', icon: c ? 'warning' : 'check', note: x[2] || '', hasNote: !!x[2] }; }),
+      dates: (sel.dates || []).map(function (x) { var c = x[1] === 'c'; return { d: x[0], st: c ? 'Konflikt' : 'Ledig', cls: c ? 'tag-warning' : 'tag-success', icon: c ? 'warning' : 'check', note: x[2] || '', hasNote: !!x[2] }; })
+    }) : {};
+    var dls = ['24 timer', '48 timer', '3 dager'], dlTxt = ['fredag 9. okt kl. 21:30', 'lørdag 10. okt kl. 21:30', 'søndag 11. okt kl. 21:30'];
+    function finish(t) { var d = Object.assign({}, st.done); d[sel.id] = true; self.setState({ done: d, dlg: null, toast: t }); }
+    return {
+      escClose: function (e) { if (e.key === 'Escape') self.setState({ dlg: null }); },
+      themeCls: this.props.dark ? 'dark' : '', count: live.length, groups: groups, empty: live.length === 0, hasSel: !!sel, sel: S,
+      isConflict: !!sel && sel.kind === 'conflict', isSeries: !!sel && sel.kind === 'series', isPart: !!sel && sel.kind === 'part', isPlain: !!sel && sel.kind === 'plain',
+      act: function () { finish({ title: 'Lagret', text: 'SMS er sendt til ' + sel.who + '.' }); },
+      openDecline: function () { self.setState({ dlg: 'decline' }); }, openReason: function () { self.setState({ dlg: 'reason' }); },
+      openPropose: function () { self.setState({ dlg: 'propose' }); }, close: function () { self.setState({ dlg: null }); },
+      dlgDecline: st.dlg === 'decline' || st.dlg === 'reason', dlgPropose: st.dlg === 'propose',
+      dlgTitle: st.dlg === 'reason' ? 'Godkjenn og avbestill eksisterende' : 'Avslå forespørselen', dlgCta: st.dlg === 'reason' ? 'Godkjenn og avbestill' : 'Avslå',
+      deadlines: dls.map(function (t, i) { return { t: t, cls: st.dl === i ? 'on' : '', pressed: st.dl === i ? 'true' : 'false', pick: function () { self.setState({ dl: i }); } }; }),
+      deadlineTxt: dlTxt[st.dl],
+      hasToast: !!st.toast, toast: st.toast || {}, closeToast: function () { self.setState({ toast: null }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

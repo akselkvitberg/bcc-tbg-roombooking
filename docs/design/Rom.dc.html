@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>Romoppsett og tilgang – admin</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="/_blob/e895aa84635a929158b5e89483b2e1bb">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&amp;display=block">
+<style>
+body{margin:0}
+a{color:#0C625C}a:hover{color:#014D49}
+</style>
+</helmet>
+<div class="bcc-root {{themeCls}}" style="position: relative; min-height: 1400px; display: flex; flex-direction: column">
+<header class="topnav">
+<a class="appmark" href="Main.dc.html"><span class="mark"><span class="ms">meeting_room</span></span>Jarlsberg rombooking</a>
+<nav class="navlinks" aria-label="Hovedmeny">
+<a class="navlink" href="Main.dc.html"><span class="ms">add_circle</span>Book</a>
+<a class="navlink" href="MineBookinger.dc.html"><span class="ms">event_note</span>Mine bookinger</a>
+<span aria-hidden="true" style="width: 1px; height: 24px; background: var(--border); align-self: center; margin: 0 6px"></span>
+<span class="label-sm subtle" style="align-self: center; margin-right: 2px">ADMINISTRASJON</span>
+<a class="navlink" href="Foresporsler.dc.html"><span class="ms">inbox</span>Forespørsler<span class="badge">7</span></a>
+<a class="navlink" href="Oversikt.dc.html"><span class="ms">view_timeline</span>Alle bookinger</a>
+<a class="navlink {{navRom}}" href="Rom.dc.html"><span class="ms">tune</span>Rom og tilgang</a>
+<a class="navlink {{navSms}}" href="Rom.dc.html"><span class="ms">sms</span>SMS-logg</a>
+</nav>
+<div style="display: flex; align-items: center; gap: 12px"><span class="tag tag-accent">Admin</span><span class="avatar" aria-hidden="true" style="background: #98afb0">OB</span><span style="font-weight: 500">Ola Berg</span></div>
+</header>
+
+<main style="width: 100%; max-width: 1360px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 4px"><h1 class="heading-2xl">Romoppsett</h1><p class="subtle">Rom, tilgang, åpningstider og stengte tider. Rom slettes aldri – sett dem som inaktive i stedet.</p></div>
+<div class="tabs" role="tablist">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button class="tab {{t.cls}}" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}"><span class="ms">{{t.icon}}</span>{{t.label}}</button></sc-for>
+</div>
+
+<sc-if value="{{tabRooms}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<section aria-label="Rom" style="flex: 1 1 320px; max-width: 380px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span class="heading-sm">14 rom · rekkefølge i oversikten</span><button class="btn btn-sm btn-secondary"><span class="ms sm">add</span>Nytt rom</button></div>
+<div class="card" style="overflow: hidden">
+<sc-for list="{{rooms}}" as="r" hint-placeholder-count="14">
+<sc-if value="{{r.head}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--sunken); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-subtle)"><span class="ms sm">apartment</span>{{r.headTxt}}</div></sc-if>
+<div style="display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--border); {{r.style}}">
+<button onClick="{{r.pick}}" aria-current="{{r.cur}}" style="flex: 1; min-width: 0; text-align: left; font: inherit; color: inherit; background: transparent; border: 0; cursor: pointer; display: flex; flex-direction: column; gap: 2px; padding: 4px 0">
+<span style="font-weight: 600; display: flex; gap: 6px; align-items: center">{{r.name}}<sc-if value="{{r.restricted}}" hint-placeholder-val="{{ false }}"><span class="tag tag-brand"><span class="ms">key</span>{{r.nPeople}} pers</span></sc-if><sc-if value="{{r.inactive}}" hint-placeholder-val="{{ false }}"><span class="tag">Inaktiv</span></sc-if></span>
+<span class="body-sm subtle">{{r.fl}} · {{r.cap}} pers · {{r.mode}}</span></button>
+<button class="btn btn-icon btn-sm btn-text" aria-label="Flytt {{r.name}} opp" onClick="{{r.up}}" disabled="{{r.first}}"><span class="ms">arrow_upward</span></button>
+<button class="btn btn-icon btn-sm btn-text" aria-label="Flytt {{r.name}} ned" onClick="{{r.down}}" disabled="{{r.last}}"><span class="ms">arrow_downward</span></button>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section class="card" aria-labelledby="ed-t" style="flex: 999 1 560px; min-width: 0">
+<div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 class="heading-xl" id="ed-t">{{sel.name}}</h2><span class="subtle">{{selWhere}}</span></div>
+<label style="display: flex; align-items: center; gap: 10px; font-weight: 500"><button class="toggle {{activeCls}}" role="switch" aria-checked="{{activeAria}}" aria-label="Aktiv" onClick="{{toggleActive}}"></button>{{activeTxt}}</label>
+</div>
+<div style="padding: 24px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="height: 150px; border-radius: 8px; border: 1px dashed var(--border-strong); background: var(--sunken); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--text-subtle); text-align: center; padding: 12px"><span class="ms" style="font-size: 32px">add_photo_alternate</span><span class="body-sm">[Bilde av rommet]</span></div>
+<button class="btn btn-sm btn-secondary"><span class="ms sm">upload</span>Last opp bilde</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px">
+<div class="field"><label for="nm">Navn</label><input id="nm" value="{{sel.name}}"></div>
+<div class="field"><label for="cp">Kapasitet</label><input id="cp" type="number" value="{{sel.cap}}"><span class="hint">Brukes til forslag</span></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div class="field"><label for="bg">Del</label><select id="bg"><option>{{selBuilding}}</option></select></div>
+<div class="field"><label for="et">Etasje</label><select id="et"><option>{{sel.fl}}</option></select></div>
+<div class="field"><label for="mp">Plassering i kartet</label><a class="btn btn-secondary" id="mp" href="Kart.dc.html" style="justify-content: flex-start"><span class="ms sm">map</span>Plasser</a></div>
+</div>
+<div class="field"><label for="ds">Beskrivelse</label><textarea id="ds" rows="2">{{sel.desc}}</textarea><span class="hint">Vises for medlemmer</span></div>
+</div>
+</div>
+
+<fieldset style="border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px">
+<legend class="heading-sm" style="margin-bottom: 10px">Hvem kan se og booke rommet</legend>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{access}}" as="m" hint-placeholder-count="2">
+<label class="card" style="padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; cursor: pointer; {{m.style}}"><input type="radio" name="access" checked="{{m.on}}" onChange="{{m.pick}}" style="width: 18px; height: 18px; margin-top: 2px; accent-color: var(--brand)"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; display: flex; gap: 6px; align-items: center"><span class="ms sm">{{m.icon}}</span>{{m.t}}</span><span class="body-sm subtle">{{m.d}}</span></span></label>
+</sc-for>
+</div>
+<sc-if value="{{sel.restricted}}" hint-placeholder-val="{{ true }}">
+<div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 14px; background: var(--sunken)">
+<div class="field" style="position: relative"><label for="ms-q">Legg til person</label>
+<div class="inputlike" style="padding-right: 6px"><span class="ms subtle">person_search</span><input id="ms-q" value="{{q}}" onChange="{{onQ}}" placeholder="Søk på navn, e-post eller telefon" autocomplete="off" style="border: 0; outline: 0; height: 38px; padding: 0; flex: 1; background: transparent; color: var(--text); font: inherit"><sc-if value="{{hasQ}}" hint-placeholder-val="{{ false }}"><button class="btn btn-icon btn-sm btn-text" aria-label="Tøm søk" onClick="{{clearQ}}"><span class="ms sm">close</span></button></sc-if></div>
+<span class="hint">Søket henter medlemmer fra medlems-API-et.</span>
+<sc-if value="{{hasQ}}" hint-placeholder-val="{{ false }}">
+<div class="card" role="listbox" aria-label="Søkeresultater" style="position: absolute; top: 72px; left: 0; right: 0; z-index: 5; box-shadow: var(--shadow-lg); overflow: hidden">
+<div style="padding: 8px 12px; font-size: 12px; color: var(--text-subtle); border-bottom: 1px solid var(--border)">{{resultTxt}}</div>
+<sc-for list="{{results}}" as="p" hint-placeholder-count="3">
+<div role="option" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--border)"><span class="avatar" style="width: 32px; height: 32px; font-size: 12px; background: {{p.bg}}">{{p.ini}}</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 500">{{p.name}}</span><span class="body-sm subtle">{{p.meta}}</span></span>
+<sc-if value="{{p.added}}" hint-placeholder-val="{{ false }}"><span class="tag tag-success"><span class="ms">check</span>Lagt til</span></sc-if>
+<sc-if value="{{p.canAdd}}" hint-placeholder-val="{{ true }}"><button class="btn btn-sm btn-secondary" onClick="{{p.add}}"><span class="ms sm">person_add</span>Legg til</button></sc-if>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 500">{{peopleTxt}}</span>
+<div class="card" style="overflow: hidden">
+<sc-for list="{{people}}" as="p" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--border)"><span class="avatar" style="width: 32px; height: 32px; font-size: 12px; background: {{p.bg}}">{{p.ini}}</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 500">{{p.name}}</span><span class="body-sm subtle">{{p.meta}}</span></span><button class="btn btn-sm btn-text" style="color: var(--red-text)" aria-label="Fjern {{p.name}}" onClick="{{p.remove}}"><span class="ms sm">person_remove</span>Fjern</button></div>
+</sc-for>
+<sc-if value="{{noPeople}}" hint-placeholder-val="{{ false }}"><div style="padding: 16px; text-align: center" class="subtle">Ingen personer lagt til ennå. Rommet kan ikke bookes av noen.</div></sc-if>
+</div>
+</div>
+<div class="msg msg-info"><span class="ms">visibility_off</span><span>Rommet er skjult for alle andre medlemmer, også i kartet. Romansvarlige ser det alltid.</span></div>
+</div>
+</sc-if>
+</fieldset>
+
+<fieldset style="border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px">
+<legend class="heading-sm" style="margin-bottom: 10px">Godkjenning</legend>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+<label class="card" style="padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; cursor: pointer; {{m.style}}"><input type="radio" name="mode" checked="{{m.on}}" onChange="{{m.pick}}" style="width: 18px; height: 18px; margin-top: 2px; accent-color: var(--brand)"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{m.t}}</span><span class="body-sm subtle">{{m.d}}</span></span></label>
+</sc-for>
+</div>
+</fieldset>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h3 class="heading-sm">Åpningstider</h3>
+<div class="card" style="overflow: hidden"><table class="tbl"><thead><tr><th>Dag</th><th>Åpent</th><th>Fra</th><th>Til</th></tr></thead><tbody>
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="7"><tr><td style="font-weight: 500; vertical-align: middle">{{h.d}}</td><td style="vertical-align: middle"><label class="check"><input type="checkbox" checked="{{h.open}}" aria-label="Åpent {{h.d}}"><span class="subtle">{{h.txt}}</span></label></td><td><div class="field"><select aria-label="Fra {{h.d}}" disabled="{{h.closed}}" style="height: 36px"><option>{{h.from}}</option></select></div></td><td><div class="field"><select aria-label="Til {{h.d}}" disabled="{{h.closed}}" style="height: 36px"><option>{{h.to}}</option></select></div></td></tr></sc-for>
+</tbody></table></div>
+</div>
+
+<div class="field"><label for="ins">Praktisk info</label><textarea id="ins" rows="3">Nøkkelkort fås i resepsjonen i Nybygget. Skjermen styres fra panelet ved døren. Sett stolene tilbake rundt bordet.</textarea><span class="hint">Vises på bekreftede bookinger.</span></div>
+<div class="msg msg-warn"><span class="ms">lock</span><span><strong>Ikke skriv dørkoder eller passord her.</strong> Praktisk infoen sendes på SMS og vises for alle som har booket rommet.</span></div>
+</div>
+<div style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px"><button class="btn btn-secondary">Forkast endringer</button><button class="btn btn-primary" onClick="{{save}}"><span class="ms">save</span>Lagre rom</button></div>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{tabClosed}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<section class="card" aria-labelledby="nc-t" style="flex: 1 1 380px; max-width: 460px; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 class="heading-lg" id="nc-t">Legg til stengt tid</h2>
+<div class="seg" role="group" aria-label="Type"><sc-for list="{{ctypes}}" as="c" hint-placeholder-count="2"><button class="{{c.cls}}" aria-pressed="{{c.pressed}}" onClick="{{c.pick}}"><span class="ms sm">{{c.icon}}</span>{{c.t}}</button></sc-for></div>
+<div class="field"><label for="cr">Gjelder</label><select id="cr"><option>Hele Nybygget</option><option>Hele AK-bygget</option><option>Hele Jarlsberg</option><option>Hovedsalen</option></select><span class="hint">Velg ett rom, en hel del eller hele Jarlsberg</span></div>
+<div class="field"><label for="cd">Dato</label><div class="inputlike" id="cd"><span class="ms subtle">calendar_month</span>17.10.2026</div></div>
+<sc-if value="{{isBlock}}" hint-placeholder-val="{{ true }}">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px"><div class="field"><label for="cf">Fra</label><select id="cf"><option>08:00</option></select></div><div class="field"><label for="ct">Til</label><select id="ct"><option>14:00</option></select></div></div>
+</sc-if>
+<div class="field"><label for="cw">Grunn</label><input id="cw" value="Rigging til konferanse"></div>
+<div class="msg msg-warn"><span class="ms">warning</span><span><strong>Påvirker 4 bookinger.</strong> Eksisterende bookinger endres ikke. Flytt eller avbestill dem fra Oversikt.</span></div>
+<button class="btn btn-primary" style="align-self: flex-start"><span class="ms">add</span>Legg til</button>
+</section>
+<section aria-labelledby="cl-t" style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<h2 class="heading-md" id="cl-t">Kommende stengte tider</h2>
+<div class="card" style="overflow-x: auto"><table class="tbl"><thead><tr><th>Dato</th><th>Gjelder</th><th>Type</th><th>Grunn</th><th style="text-align: right">Påvirker</th><th></th></tr></thead><tbody>
+<tr><td>Tor 8. okt</td><td>Møterom AK2</td><td><span class="tag">11:00–13:00</span></td><td>Rengjøring</td><td style="text-align: right">0</td><td style="text-align: right"><button class="btn btn-icon btn-sm btn-text" aria-label="Fjern"><span class="ms">delete</span></button></td></tr>
+<tr><td>Lør 24. okt</td><td>Hele AK-bygget</td><td><span class="tag tag-danger">Hele dagen</span></td><td>Dugnad – maling av gangene</td><td style="text-align: right"><span class="tag tag-warning">3 bookinger</span></td><td style="text-align: right"><button class="btn btn-icon btn-sm btn-text" aria-label="Fjern"><span class="ms">delete</span></button></td></tr>
+<tr><td>Ons 11. nov</td><td>Studio</td><td><span class="tag">08:00–16:00</span></td><td>Service på lydanlegg</td><td style="text-align: right">0</td><td style="text-align: right"><button class="btn btn-icon btn-sm btn-text" aria-label="Fjern"><span class="ms">delete</span></button></td></tr>
+<tr><td>Fre 25. des</td><td>Hele Jarlsberg</td><td><span class="tag tag-danger">Hele dagen</span></td><td>1. juledag</td><td style="text-align: right">0</td><td style="text-align: right"><button class="btn btn-icon btn-sm btn-text" aria-label="Fjern"><span class="ms">delete</span></button></td></tr>
+</tbody></table></div>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{tabTypes}}" hint-placeholder-val="{{ false }}">
+<section style="display: flex; flex-direction: column; gap: 12px; max-width: 900px">
+<p class="subtle">Typer er merkelapper medlemmene setter på bookingene sine. De brukes til filter og oversikt for ledere og romansvarlige, og til statistikk her. I v1 påvirker typen ikke godkjenning eller prioritering.</p>
+<div class="card" style="overflow-x: auto"><table class="tbl"><thead><tr><th>Type</th><th>Beskrivelse</th><th style="text-align: right">Bookinger siste 30 dager</th><th style="text-align: right">Andel</th><th style="text-align: right">Aktiv</th></tr></thead><tbody>
+<sc-for list="{{typeRows}}" as="t" hint-placeholder-count="7"><tr><td><span class="ttag {{t.cls}}"><span class="ms">{{t.icon}}</span>{{t.name}}</span></td><td class="subtle">{{t.desc}}</td><td style="text-align: right; font-variant-numeric: tabular-nums">{{t.n}}</td><td style="text-align: right">{{t.share}}</td><td style="text-align: right"><span class="toggle" role="img" aria-label="Aktiv" style="display: inline-block"></span></td></tr></sc-for>
+</tbody></table></div>
+<button class="btn btn-secondary" style="align-self: flex-start"><span class="ms">add</span>Ny type</button>
+</section>
+</sc-if>
+
+<sc-if value="{{tabSms}}" hint-placeholder-val="{{ false }}">
+<section style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between"><p class="subtle">Alle meldinger som er sendt, nyeste først.</p><div class="inputlike" style="width: 280px"><span class="ms subtle">search</span><span class="subtle">Søk på navn eller nummer</span></div></div>
+<div class="card" style="overflow-x: auto"><table class="tbl"><thead><tr><th style="width: 140px">Tid</th><th style="width: 200px">Mottaker</th><th style="width: 150px">Type</th><th>Melding</th></tr></thead><tbody>
+<sc-for list="{{sms}}" as="m" hint-placeholder-count="6"><tr><td style="white-space: nowrap">{{m.t}}</td><td><div style="font-weight: 500">{{m.who}}</div><div class="body-sm subtle">{{m.nr}}</div></td><td><span class="tag {{m.cls}}">{{m.type}}</span></td><td>{{m.text}}</td></tr></sc-for>
+</tbody></table></div>
+</section>
+</sc-if>
+</main>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+<div class="toast" role="status"><span class="ms fill" style="color: var(--green)">check_circle</span><div style="flex: 1"><strong>{{toastTxt}}</strong></div><button class="btn btn-icon btn-sm btn-text" aria-label="Lukk melding" onClick="{{closeToast}}"><span class="ms">close</span></button></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1360,"height":1400}}'>
+var MEMBERS = [
+  { id: 1, name: 'Kari Moe', meta: 'Tønsberg · kari.moe@epost.no' }, { id: 2, name: 'Lars Holm', meta: 'Sandefjord · +47 950 71 336' },
+  { id: 3, name: 'Siv Lund', meta: 'Tønsberg · siv.lund@epost.no' }, { id: 4, name: 'Per Lie', meta: 'Stokke · +47 905 11 642' },
+  { id: 5, name: 'Ingrid Hansen', meta: 'Tønsberg · +47 912 34 567' }, { id: 6, name: 'Hans Vik', meta: 'Horten · hans.vik@epost.no' },
+  { id: 7, name: 'Markus Dahl', meta: 'Sandefjord · +47 977 20 118' }, { id: 8, name: 'Martin Lie', meta: 'Larvik · martin.lie@epost.no' },
+  { id: 9, name: 'Marte Lien', meta: 'Tønsberg · +47 404 88 120' }, { id: 10, name: 'Mari Lindberg', meta: 'Re · mari.l@epost.no' },
+  { id: 11, name: 'Emil Sand', meta: 'Tønsberg · +47 469 15 283' }, { id: 12, name: 'Nina Berg', meta: 'Nøtterøy · +47 481 22 590' }
+];
+var BG = ['#ceba97', '#98afb0', '#dbe1c0', '#d3cfc9', '#bd8167'];
+var R0 = [
+  { id: 'n1', b: 'N', fl: '1. etasje', name: 'Hovedsalen', cap: 500, auto: false, active: true, desc: 'Stor sal med scene, lyd og lys.' },
+  { id: 'n2', b: 'N', fl: '1. etasje', name: 'Sal A', cap: 120, auto: false, active: true, desc: 'Konferansesal med skillevegg mot Sal B.' },
+  { id: 'n3', b: 'N', fl: '1. etasje', name: 'Sal B', cap: 80, auto: false, active: true, desc: 'Konferansesal. Kan slås sammen med Sal A.' },
+  { id: 'n4', b: 'N', fl: '1. etasje', name: 'Kafeen', cap: 60, auto: true, active: true, desc: 'Kafé ut mot foajeen.' },
+  { id: 'n5', b: 'N', fl: '2. etasje', name: 'Grupperom 1', cap: 12, auto: true, active: true, desc: 'Grupperom med skjerm og whiteboard.' },
+  { id: 'n6', b: 'N', fl: '2. etasje', name: 'Grupperom 2', cap: 12, auto: true, active: true, desc: 'Grupperom med skjerm og whiteboard.' },
+  { id: 'n7', b: 'N', fl: '2. etasje', name: 'Grupperom 3', cap: 8, auto: true, active: true, desc: 'Lite grupperom med vindu mot parken.' },
+  { id: 'n8', b: 'N', fl: '2. etasje', name: 'Styrerommet', cap: 16, auto: false, active: true, restricted: true, people: [1, 2, 3], desc: 'Styrerom med videokonferanse.' },
+  { id: 'a1', b: 'A', fl: '1. etasje', name: 'AK-salen', cap: 150, auto: false, active: true, desc: 'Flerbrukssal, mye brukt av ungdom.' },
+  { id: 'a2', b: 'A', fl: '1. etasje', name: 'Ungdomskafeen', cap: 60, auto: true, active: true, desc: 'Sofaer, biljard og storskjerm.' },
+  { id: 'a3', b: 'A', fl: '1. etasje', name: 'Kjøkkenet', cap: 15, auto: false, active: true, restricted: true, people: [4, 5, 6], desc: 'Storkjøkken. Krever hygienekurs.' },
+  { id: 'a4', b: 'A', fl: '2. etasje', name: 'Møterom AK1', cap: 10, auto: true, active: true, desc: 'Møterom med skjerm.' },
+  { id: 'a5', b: 'A', fl: '2. etasje', name: 'Møterom AK2', cap: 10, auto: true, active: true, desc: 'Møterom med skjerm.' },
+  { id: 'a6', b: 'A', fl: '2. etasje', name: 'Studio', cap: 6, auto: false, active: false, restricted: true, people: [7, 5], desc: 'Lydstudio for opptak.' }
+];
+var BN = { N: 'Nybygget', A: 'AK-bygget' };
+var TYPEDEF = [['ungdom', 'Ungdom', 'groups', 'Ungdomskvelder, klubber, leirmøter', 41, '34%'], ['mote', 'Møte', 'forum', 'Styrer, råd, ledermøter', 28, '23%'], ['ovelse', 'Øvelse', 'music_note', 'Kor, band, opptak', 19, '16%'], ['dugnad', 'Dugnad', 'construction', 'Vask, vedlikehold, rigging', 6, '5%'], ['arr', 'Arrangement', 'celebration', 'Fester, konserter, samlinger', 14, '12%'], ['annet', 'Annet', 'label', 'Alt annet', 12, '10%'], ['konf', 'Konferanse', 'business_center', 'Bare for konferanseavdelingen', 0, '–']];
+function ini(n) { return n.split(' ').map(function (w) { return w[0]; }).join('').slice(0, 2); }
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { tab: 0, rooms: R0, sel: 'n8', ctype: 1, toast: null, q: 'mar' }; }
+  renderVals() {
+    var self = this, st = this.state, rs = st.rooms;
+    var sel = rs.filter(function (r) { return r.id === st.sel; })[0];
+    function upd(patch) { self.setState({ rooms: rs.map(function (r) { return r.id === sel.id ? Object.assign({}, r, patch) : r; }) }); }
+    function swap(i, j) { var a = rs.slice(); var t = a[i]; a[i] = a[j]; a[j] = t; self.setState({ rooms: a }); }
+    function person(m) { return { name: m.name, meta: m.meta, ini: ini(m.name), bg: BG[m.id % BG.length] }; }
+    var tabs = [['Rom og tilgang', 'meeting_room'], ['Stengte tider', 'event_busy'], ['SMS-logg', 'sms'], ['Typer', 'sell']].map(function (t, i) {
+      return { label: t[0], icon: t[1], cls: st.tab === i ? 'active' : '', sel: st.tab === i ? 'true' : 'false', pick: function () { self.setState({ tab: i }); } };
+    });
+    var days = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'];
+    var hours = days.map(function (d, i) { var open = i !== 6; return { d: d, open: open, closed: !open, txt: open ? 'Åpent' : 'Stengt', from: open ? (i === 5 ? '10:00' : '08:00') : '–', to: open ? (i === 5 ? '23:00' : '22:00') : '–' }; });
+    var ids = sel.people || [];
+    var people = MEMBERS.filter(function (m) { return ids.indexOf(m.id) >= 0; }).map(function (m) {
+      return Object.assign(person(m), { remove: function () { upd({ people: ids.filter(function (x) { return x !== m.id; }) }); } });
+    });
+    var q = st.q.trim().toLowerCase();
+    var results = q ? MEMBERS.filter(function (m) { return m.name.toLowerCase().indexOf(q) >= 0 || m.meta.toLowerCase().indexOf(q) >= 0; }).slice(0, 5).map(function (m) {
+      var added = ids.indexOf(m.id) >= 0;
+      return Object.assign(person(m), { added: added, canAdd: !added, add: function () { upd({ people: ids.concat([m.id]) }); } });
+    }) : [];
+    var SMS = [
+      ['I dag 09:41', 'Ingrid Hansen', '+47 912 34 567', 'Bekreftet', 'tag-success', 'Jarlsberg: Grupperom 1 tor 15. okt–3. des kl. 18:00–19:30 er bekreftet (7 datoer). 2 datoer venter på godkjenning.'],
+      ['I dag 08:12', 'Emil Sand', '+47 469 15 283', 'Flyttet', 'tag-info', 'Jarlsberg: Bookingen din er flyttet fra AK-salen til Ungdomskafeen tor 8. okt kl. 18:00–21:00. Begrunnelse: AK-salen trengs til konferansemiddag.'],
+      ['I går 21:30', 'Jonas Aas', '+47 934 55 210', 'Forslag', 'tag-accent', 'Jarlsberg: Vi foreslår AK-salen i stedet for Sal A fre 9. okt kl. 18:00–22:00. Svar innen 10. okt kl. 21:30 i appen.'],
+      ['I går 16:05', 'Lise Aune', '+47 993 47 618', 'Kvittering', '', 'Jarlsberg: Du har avbestilt Møterom AK2 fre 9. okt kl. 17:00–18:00.'],
+      ['7. okt 19:58', 'Marte Lien', '+47 404 88 120', 'Avslått', 'tag-danger', 'Jarlsberg: Forespørselen din om Hovedsalen fre 2. okt er avslått. Begrunnelse: Salen er satt opp for konferanse hele helgen.'],
+      ['7. okt 14:00', 'Kristoffer Ek', '+47 952 30 771', 'Utløpt', 'tag-warning', 'Jarlsberg: Forslaget om Møterom AK1 ons 7. okt ble ikke besvart innen fristen. Forespørselen er avbestilt.']
+    ].map(function (m) { return { t: m[0], who: m[1], nr: m[2], type: m[3], cls: m[4], text: m[5] }; });
+    return {
+      themeCls: this.props.dark ? 'dark' : '', tabs: tabs, tabRooms: st.tab === 0, tabClosed: st.tab === 1, tabSms: st.tab === 2, tabTypes: st.tab === 3,
+      navRom: st.tab !== 2 ? 'active' : '',
+      typeRows: TYPEDEF.map(function (t) { return { name: t[1], icon: t[2], cls: 'tt-' + t[0], desc: t[3], n: t[4], share: t[5] }; }), navSms: st.tab === 2 ? 'active' : '',
+      rooms: rs.map(function (r, i) { var on = r.id === sel.id; var prev = rs[i - 1], next = rs[i + 1];
+        return { name: r.name, cap: r.cap, fl: r.fl, mode: r.auto ? 'Automatisk' : 'Manuell', inactive: !r.active, restricted: !!r.restricted, nPeople: (r.people || []).length,
+          head: !prev || prev.b !== r.b, headTxt: BN[r.b],
+          cur: on ? 'true' : 'false', style: on ? 'background: var(--brand-soft); box-shadow: inset 3px 0 0 var(--brand)' : '',
+          first: !prev || prev.b !== r.b, last: !next || next.b !== r.b,
+          pick: function () { self.setState({ sel: r.id }); }, up: function () { if (prev && prev.b === r.b) swap(i, i - 1); }, down: function () { if (next && next.b === r.b) swap(i, i + 1); } }; }),
+      sel: Object.assign({}, sel, { restricted: !!sel.restricted }), selWhere: BN[sel.b] + ', ' + sel.fl, selBuilding: BN[sel.b],
+      activeCls: sel.active ? '' : 'off', activeAria: sel.active ? 'true' : 'false', activeTxt: sel.active ? 'Aktiv – kan bookes' : 'Inaktiv – kan ikke bookes',
+      toggleActive: function () { upd({ active: !sel.active }); },
+      access: [[false, 'Alle medlemmer', 'Alle med medlemskap ser og kan booke rommet.', 'groups'], [true, 'Bare utvalgte personer', 'Rommet er skjult for alle andre.', 'key']].map(function (m) {
+        var on = !!sel.restricted === m[0]; return { t: m[1], d: m[2], icon: m[3], on: on, style: on ? 'border-color: var(--brand); background: var(--brand-soft)' : '', pick: function () { upd({ restricted: m[0], people: sel.people || [] }); } }; }),
+      q: st.q, hasQ: !!q, onQ: function (e) { self.setState({ q: e.target.value }); }, clearQ: function () { self.setState({ q: '' }); },
+      results: results, resultTxt: results.length ? results.length + ' treff i medlemsregisteret' : 'Ingen treff',
+      people: people, noPeople: people.length === 0, peopleTxt: people.length + (people.length === 1 ? ' person har tilgang' : ' personer har tilgang'),
+      modes: [[true, 'Automatisk', 'Bekreftes med en gang når tiden er ledig.'], [false, 'Manuell', 'Alle bookinger går til romansvarlig.']].map(function (m) {
+        var on = sel.auto === m[0]; return { t: m[1], d: m[2], on: on, style: on ? 'border-color: var(--brand); background: var(--brand-soft)' : '', pick: function () { upd({ auto: m[0] }); } }; }),
+      hours: hours,
+      ctypes: [['Stengt dag', 'event_busy'], ['Blokkert tid', 'block']].map(function (c, i) { return { t: c[0], icon: c[1], cls: st.ctype === i ? 'on' : '', pressed: st.ctype === i ? 'true' : 'false', pick: function () { self.setState({ ctype: i }); } }; }),
+      isBlock: st.ctype === 1, sms: SMS,
+      save: function () { self.setState({ toast: sel.name + ' er lagret' }); }, hasToast: !!st.toast, toastTxt: st.toast || '', closeToast: function () { self.setState({ toast: null }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

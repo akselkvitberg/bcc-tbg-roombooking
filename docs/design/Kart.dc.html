@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>Kart over rommene</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="/_blob/e895aa84635a929158b5e89483b2e1bb">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&amp;display=block">
+<style>
+body{margin:0}
+a{color:#0C625C}a:hover{color:#014D49}
+</style>
+</helmet>
+<div class="bcc-root {{themeCls}}" style="position: relative; min-height: 1000px; display: flex; flex-direction: column">
+<header class="topnav">
+<a class="appmark" href="Main.dc.html"><span class="mark"><span class="ms">meeting_room</span></span>Jarlsberg rombooking</a>
+<nav class="navlinks" aria-label="Hovedmeny">
+<a class="navlink" href="Main.dc.html"><span class="ms">add_circle</span>Book</a>
+<a class="navlink" href="Dagsoversikt.dc.html"><span class="ms">calendar_view_day</span>Dagsoversikt</a>
+<a class="navlink active" href="Kart.dc.html" aria-current="page"><span class="ms">map</span>Kart</a>
+<a class="navlink" href="MineBookinger.dc.html"><span class="ms">event_note</span>Mine bookinger<span class="badge">1</span></a>
+</nav>
+<div style="display: flex; align-items: center; gap: 12px"><span class="avatar" aria-hidden="true">IH</span><span style="font-weight: 500">Ingrid Hansen</span></div>
+</header>
+
+<main style="width: 100%; max-width: 1360px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px"><h1 class="heading-2xl">Kart</h1><p class="subtle">Se hvor rommene er, og hva som er ledig på et gitt tidspunkt.</p></div>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px">
+<div class="field" style="width: 220px"><label for="kd">Dato</label><div class="inputlike" id="kd"><span class="ms subtle">calendar_month</span>Tor 8. okt 2026</div></div>
+<div class="field" style="width: 150px"><label for="kt">Tidspunkt</label><select id="kt" value="{{tv}}" onChange="{{onTime}}"><sc-for list="{{times}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}">{{o.t}}</option></sc-for></select></div>
+<div class="seg" role="group" aria-label="Etasje" style="margin-bottom: 1px"><sc-for list="{{floors}}" as="f" hint-placeholder-count="2"><button class="{{f.cls}}" aria-pressed="{{f.pressed}}" onClick="{{f.pick}}"><span class="ms sm">stairs</span>{{f.t}}</button></sc-for></div>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<section class="card" aria-label="Plantegning {{floorName}}" style="flex: 999 1 640px; min-width: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap">
+<span class="heading-sm">{{floorName}} · {{timeTxt}}</span>
+<span class="tag tag-accent"><span class="ms">info</span>Eksempelkart – byttes ut med ekte plantegning</span>
+</div>
+<div style="position: relative; width: 100%; aspect-ratio: 2 / 1; min-height: 340px; background: var(--sunken); border-radius: 8px; overflow: hidden">
+<sc-for list="{{buildings}}" as="b" hint-placeholder-count="2">
+<div aria-hidden="true" style="position: absolute; left: {{b.x}}%; top: {{b.y}}%; width: {{b.w}}%; height: {{b.h}}%; border: 3px solid var(--border-strong); border-radius: 6px; background: var(--surface)"></div>
+<div aria-hidden="true" style="position: absolute; left: {{b.x}}%; top: calc({{b.y}}% - 24px); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-subtle); display: flex; align-items: center; gap: 4px"><span class="ms sm">apartment</span>{{b.name}}</div>
+</sc-for>
+<sc-for list="{{spaces}}" as="s" hint-placeholder-count="3">
+<div aria-hidden="true" style="position: absolute; left: {{s.x}}%; top: {{s.y}}%; width: {{s.w}}%; height: {{s.h}}%; border-radius: 4px; background: var(--sunken); border: 1px dashed var(--border-strong); display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; color: var(--text-subtle)"><span class="ms sm">{{s.icon}}</span>{{s.t}}</div>
+</sc-for>
+<sc-for list="{{rooms}}" as="r" hint-placeholder-count="7">
+<button class="s-{{r.st}}" onClick="{{r.pick}}" aria-label="{{r.aria}}" aria-pressed="{{r.pressed}}" style="position: absolute; left: {{r.x}}%; top: {{r.y}}%; width: {{r.w}}%; height: {{r.h}}%; border: 1px solid var(--border-strong); border-radius: 4px; padding: 8px 10px; font: inherit; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; overflow: hidden; {{r.selStyle}}">
+<span style="font-weight: 600; font-size: 13px; line-height: 16px; display: flex; gap: 4px; align-items: center">{{r.name}}<sc-if value="{{r.restricted}}" hint-placeholder-val="{{ false }}"><span class="ms sm">key</span></sc-if></span>
+<span style="display: flex; justify-content: space-between; align-items: flex-end; gap: 4px; font-size: 12px; font-weight: 500"><span style="display: flex; gap: 4px; align-items: center"><span class="ms sm {{r.fill}}">{{r.icon}}</span>{{r.label}}</span><span style="opacity: .8">{{r.cap}} pers</span></span>
+</button>
+</sc-for>
+<sc-if value="{{showBridge}}" hint-placeholder-val="{{ true }}">
+<div aria-hidden="true" style="position: absolute; left: 60%; top: 44%; width: 6%; height: 12%; background: var(--surface); border-top: 3px solid var(--border-strong); border-bottom: 3px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text-subtle); text-align: center; line-height: 13px">Glass-<br>gang</div>
+</sc-if>
+<div aria-hidden="true" style="position: absolute; right: 12px; bottom: 10px; display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-subtle)"><span class="ms sm">north</span>N</div>
+</div>
+<div class="legend">
+<span class="lg"><span class="sw" style="background: var(--surface)"></span>Ledig</span>
+<span class="lg"><span class="sw s-busy"><span class="ms">block</span></span>Opptatt</span>
+<span class="lg"><span class="sw s-req"><span class="ms">schedule</span></span>Forespurt</span>
+<span class="lg"><span class="sw s-closed"><span class="ms">lock</span></span>Stengt</span>
+<span class="lg"><span class="sw s-mine"><span class="ms">check_circle</span></span>Din booking</span>
+<span class="lg"><span class="sw s-myreq"><span class="ms">hourglass_top</span></span>Venter på svar</span>
+<span class="lg"><span class="sw" style="border-style: dashed; background: var(--sunken)"></span>Ikke bookbart</span>
+</div>
+</section>
+
+<aside class="card" aria-labelledby="sel-t" style="flex: 1 1 300px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="height: 120px; border-radius: 8px; background: var(--sunken); border: 1px dashed var(--border-strong); display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--text-subtle); font-size: 12px"><span class="ms">image</span>[Bilde av {{sel.name}}]</div>
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 class="heading-xl" id="sel-t">{{sel.name}}</h2><span class="subtle">{{sel.where}}</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag"><span class="ms">group</span>Maks {{sel.cap}}</span><span class="tag {{sel.modeCls}}"><span class="ms">{{sel.modeIcon}}</span>{{sel.mode}}</span><sc-if value="{{sel.restricted}}" hint-placeholder-val="{{ false }}"><span class="tag tag-brand"><span class="ms">key</span>Du har tilgang</span></sc-if></div>
+<p>{{sel.desc}}</p>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="label-sm subtle">I DAG 08–22</span>
+<div style="display: grid; grid-template-columns: repeat(28, minmax(0, 1fr)); gap: 1px; height: 28px; border-radius: 4px; overflow: hidden" aria-label="{{sel.dayAria}}">
+<sc-for list="{{sel.bar}}" as="x" hint-placeholder-count="28"><span class="s-{{x.st}}" style="{{x.mark}}"></span></sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-subtle)"><span>08</span><span>12</span><span>16</span><span>20</span><span>22</span></div>
+</div>
+<div class="msg {{sel.msgCls}}"><span class="ms">{{sel.icon}}</span><span><strong>{{sel.label}}</strong> kl. {{timeTxt}}</span></div>
+<a class="btn btn-primary" href="Main.dc.html"><span class="ms">add</span>Book {{sel.name}}</a>
+<a class="btn btn-secondary" href="Main.dc.html"><span class="ms">select_all</span>Reserver hele {{sel.bname}}</a>
+</aside>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1360,"height":1000}}'>
+var ROOMS = [
+  { id: 'n1', b: 'N', f: 1, name: 'Hovedsalen', cap: 500, auto: false, open: [0, 28], items: [[0, 18, 'busy'], [22, 28, 'req']], m: [4, 10, 30, 50], desc: 'Stor sal med scene, teleskopgalleri, lyd og lys.' },
+  { id: 'n2', b: 'N', f: 1, name: 'Sal A', cap: 120, auto: false, open: [0, 28], items: [[1, 17, 'busy'], [20, 26, 'busy']], m: [36, 10, 22, 28], desc: 'Konferansesal med skillevegg mot Sal B.' },
+  { id: 'n3', b: 'N', f: 1, name: 'Sal B', cap: 80, auto: false, open: [0, 28], items: [[1, 17, 'busy'], [22, 26, 'mine']], m: [36, 40, 22, 20], desc: 'Konferansesal. Kan slås sammen med Sal A.' },
+  { id: 'n4', b: 'N', f: 1, name: 'Kafeen', cap: 60, auto: true, open: [0, 28], items: [[0, 4, 'busy'], [8, 12, 'busy']], m: [40, 64, 18, 24], desc: 'Kafé med servering ut mot foajeen.' },
+  { id: 'n5', b: 'N', f: 2, name: 'Grupperom 1', cap: 12, auto: true, open: [0, 28], items: [[2, 16, 'busy'], [20, 23, 'busy']], m: [4, 10, 16, 30], desc: 'Grupperom med skjerm og whiteboard.' },
+  { id: 'n6', b: 'N', f: 2, name: 'Grupperom 2', cap: 12, auto: true, open: [0, 28], items: [[2, 16, 'busy']], m: [22, 10, 16, 30], desc: 'Grupperom med skjerm og whiteboard.' },
+  { id: 'n7', b: 'N', f: 2, name: 'Grupperom 3', cap: 8, auto: true, open: [0, 28], items: [[2, 12, 'busy'], [22, 24, 'req']], m: [40, 10, 18, 30], desc: 'Lite grupperom med vindu mot parken.' },
+  { id: 'a1', b: 'A', f: 1, name: 'AK-salen', cap: 150, auto: false, open: [0, 28], items: [[4, 10, 'busy']], m: [68, 18, 28, 34], desc: 'Flerbrukssal, mye brukt av ungdom på kveldstid.' },
+  { id: 'a2', b: 'A', f: 1, name: 'Ungdomskafeen', cap: 60, auto: true, open: [16, 28], items: [[20, 26, 'busy']], m: [68, 54, 16, 30], desc: 'Kafé med sofaer, biljard og storskjerm.' },
+  { id: 'a3', b: 'A', f: 1, name: 'Kjøkkenet', cap: 15, auto: false, restricted: true, open: [0, 28], items: [[6, 10, 'busy'], [18, 21, 'myreq']], m: [86, 54, 10, 30], desc: 'Storkjøkken. Bare for personer med hygienekurs.' },
+  { id: 'a4', b: 'A', f: 2, name: 'Møterom AK1', cap: 10, auto: true, open: [0, 28], items: [[0, 3, 'busy'], [18, 22, 'busy']], m: [68, 18, 14, 30], desc: 'Møterom med skjerm.' },
+  { id: 'a5', b: 'A', f: 2, name: 'Møterom AK2', cap: 10, auto: true, open: [0, 24], items: [[6, 10, 'closed'], [18, 20, 'busy']], m: [84, 18, 12, 30], desc: 'Møterom med skjerm.' },
+  { id: 'a6', b: 'A', f: 2, name: 'Studio', cap: 6, auto: false, restricted: true, open: [4, 24], items: [[10, 14, 'busy']], m: [68, 54, 28, 30], desc: 'Lydstudio for opptak og podkast.' }
+];
+var SPACES = {
+  1: [[4, 64, 34, 24, 'Foajé', 'door_front'], [36, 62, 3, 2, '', '']],
+  2: [[4, 44, 54, 8, 'Gang', 'east'], [4, 56, 34, 32, 'Galleri (åpent ned)', 'visibility'], [40, 56, 18, 32, '', 'block'], [68, 86, 28, 4, '', '']]
+};
+var BLD = [{ name: 'Nybygget', x: 2, y: 6, w: 58, h: 88 }, { name: 'AK-bygget', x: 66, y: 12, w: 32, h: 80 }];
+var BN = { N: 'Nybygget', A: 'AK-bygget' };
+var LBL = { free: 'Ledig', busy: 'Opptatt', req: 'Forespurt', closed: 'Stengt', mine: 'Din booking', myreq: 'Venter på svar' };
+var ICON = { free: 'check', busy: 'block', req: 'schedule', closed: 'lock', mine: 'check_circle', myreq: 'hourglass_top' };
+var MSG = { free: 'msg-success', busy: 'msg-warn', req: 'msg-warn', closed: 'msg-warn', mine: 'msg-info', myreq: 'msg-info' };
+var PRI = { free: 1, req: 2, myreq: 3, busy: 4, mine: 5, closed: 6 };
+function T(i) { var m = 480 + i * 30; var h = Math.floor(m / 60); return (h < 10 ? '0' : '') + h + ':' + (m % 60 ? '30' : '00'); }
+function stAt(r, i) { if (i < r.open[0] || i >= r.open[1]) return 'closed'; var b = 'free'; r.items.forEach(function (it) { if (i >= it[0] && i < it[1] && PRI[it[2]] > PRI[b]) b = it[2]; }); return b; }
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { floor: 1, t: 22, sel: 'a1' }; }
+  renderVals() {
+    var self = this, st = this.state;
+    var times = []; for (var i = 0; i < 28; i++) times.push({ v: String(i), t: T(i) });
+    var rooms = ROOMS.filter(function (r) { return r.f === st.floor; }).map(function (r) {
+      var s = stAt(r, st.t), on = r.id === st.sel;
+      return { name: r.name, cap: r.cap, restricted: !!r.restricted, st: s, icon: ICON[s], label: LBL[s], fill: s === 'mine' ? 'fill' : '',
+        x: r.m[0], y: r.m[1], w: r.m[2], h: r.m[3], pressed: on ? 'true' : 'false',
+        selStyle: on ? 'outline: 3px solid var(--brand); outline-offset: 2px; z-index: 2' : (s === 'free' ? 'background: var(--surface); color: var(--text)' : ''),
+        aria: r.name + ', ' + BN[r.b] + ' ' + r.f + '. etasje, ' + r.cap + ' personer, ' + LBL[s] + ' kl. ' + T(st.t),
+        pick: function () { self.setState({ sel: r.id }); } };
+    });
+    var sr = ROOMS.filter(function (r) { return r.id === st.sel; })[0], ss = stAt(sr, st.t);
+    var bar = []; for (var k = 0; k < 28; k++) { var x = stAt(sr, k); bar.push({ st: x === 'free' ? 'free' : x, mark: (x === 'free' ? 'background: var(--green-soft);' : '') + (k === st.t ? 'box-shadow: inset 0 0 0 2px var(--text)' : '') }); }
+    return {
+      themeCls: this.props.dark ? 'dark' : '', times: times, tv: String(st.t), timeTxt: T(st.t) + '–' + T(st.t + 1),
+      onTime: function (e) { self.setState({ t: +e.target.value }); },
+      floors: [1, 2].map(function (f) { return { t: f + '. etasje', cls: st.floor === f ? 'on' : '', pressed: st.floor === f ? 'true' : 'false', pick: function () { self.setState({ floor: f, sel: ROOMS.filter(function (r) { return r.f === f; })[0].id }); } }; }),
+      floorName: st.floor + '. etasje', buildings: BLD, showBridge: st.floor === 1,
+      spaces: SPACES[st.floor].filter(function (s) { return s[2] > 3; }).map(function (s) { return { x: s[0], y: s[1], w: s[2], h: s[3], t: s[4], icon: s[5] }; }),
+      rooms: rooms,
+      sel: { name: sr.name, where: BN[sr.b] + ', ' + sr.f + '. etasje', cap: sr.cap, desc: sr.desc, restricted: !!sr.restricted, bname: BN[sr.b],
+        mode: sr.auto ? 'Automatisk' : 'Krever godkjenning', modeIcon: sr.auto ? 'bolt' : 'how_to_reg', modeCls: sr.auto ? 'tag-success' : 'tag-info',
+        label: LBL[ss], icon: ICON[ss], msgCls: MSG[ss], bar: bar, dayAria: 'Dagsoversikt for ' + sr.name }
+    };
+  }
+}
+</script>
+</body>
+</html>

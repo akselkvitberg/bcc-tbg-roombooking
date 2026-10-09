@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>Dagsoversikt</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="/_blob/e895aa84635a929158b5e89483b2e1bb">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&amp;display=block">
+<style>
+body{margin:0}
+a{color:#0C625C}a:hover{color:#014D49}
+</style>
+</helmet>
+<div class="bcc-root {{themeCls}}" style="position: relative; min-height: 1180px; display: flex; flex-direction: column">
+
+<header class="topnav">
+<a class="appmark" href="Main.dc.html"><span class="mark"><span class="ms">meeting_room</span></span>Jarlsberg rombooking</a>
+<nav class="navlinks" aria-label="Hovedmeny">
+<a class="navlink" href="Main.dc.html"><span class="ms">add_circle</span>Book</a>
+<a class="navlink active" href="Dagsoversikt.dc.html" aria-current="page"><span class="ms">calendar_view_day</span>Dagsoversikt</a>
+<a class="navlink" href="Kart.dc.html"><span class="ms">map</span>Kart</a>
+<a class="navlink" href="MineBookinger.dc.html"><span class="ms">event_note</span>Mine bookinger<span class="badge" aria-label="1 venter på svar">1</span></a>
+</nav>
+<div style="display: flex; align-items: center; gap: 12px">
+<button class="btn btn-icon btn-text" aria-label="Bytt mellom lys og mørk modus" onClick="{{toggleTheme}}"><span class="ms">{{themeIcon}}</span></button>
+<span class="avatar" aria-hidden="true">IH</span>
+<span style="font-weight: 500">Ingrid Hansen</span>
+</div>
+</header>
+
+<main style="width: 100%; max-width: 1360px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="heading-2xl">Dagsoversikt</h1>
+<p class="subtle">Alle rom og halvtimer for én dag. For raskere booking av en periode, bruk <a href="Main.dc.html">Book</a>.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<div class="seg" role="group" aria-label="Visning">
+<button class="on" aria-pressed="true"><span class="ms sm">view_day</span>Dag</button>
+<button aria-pressed="false"><span class="ms sm">view_week</span>Uke</button>
+</div>
+<button class="btn btn-secondary btn-icon" aria-label="Forrige dag"><span class="ms">chevron_left</span></button>
+<div class="inputlike" style="width: 260px"><span class="ms subtle">calendar_month</span><span style="flex: 1">Torsdag 8. oktober 2026</span><span class="tag">Uke 41</span></div>
+<button class="btn btn-secondary btn-icon" aria-label="Neste dag"><span class="ms">chevron_right</span></button>
+<button class="btn btn-secondary">I dag</button>
+</div>
+</div>
+
+<div class="msg msg-info" role="status">
+<span class="ms">forum</span>
+<div style="flex: 1"><strong>Du har et forslag som venter på svar.</strong> <span>Romansvarlig foreslår Sal B i stedet for Hovedsalen lørdag 10. okt. Svar innen fredag 9. okt kl. 14:00.</span></div>
+<a class="btn btn-sm btn-text" href="MineBookinger.dc.html">Se forslaget<span class="ms sm">arrow_forward</span></a>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+<div class="legend" aria-label="Forklaring">
+<span class="lg"><span class="sw" style="background: var(--surface)"></span>Ledig</span>
+<span class="lg"><span class="sw s-busy"><span class="ms">block</span></span>Opptatt</span>
+<span class="lg"><span class="sw s-req"><span class="ms">schedule</span></span>Forespurt</span>
+<span class="lg"><span class="sw s-closed"><span class="ms">lock</span></span>Stengt</span>
+<span class="lg"><span class="sw s-mine"><span class="ms">check_circle</span></span>Din booking</span>
+<span class="lg"><span class="sw s-myreq"><span class="ms">hourglass_top</span></span>Venter på svar</span>
+</div>
+<span class="body-sm subtle" style="display: flex; align-items: center; gap: 6px"><span class="limited"><span class="ms">key</span>Begrenset</span>= rom bare utvalgte kan booke – du har tilgang</span>
+</div>
+
+<div class="gridwrap" role="grid" aria-label="Tilgjengelighet torsdag 8. oktober, rom og halvtimer fra 08:00 til 22:00">
+<div style="min-width: 1100px">
+<div role="row" style="display: grid; grid-template-columns: 200px repeat(14, minmax(64px, 1fr))">
+<div class="ghead" role="columnheader" style="padding-left: 12px; position: sticky; left: 0; z-index: 3; border-right: 1px solid var(--border)">Rom</div>
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="14">
+<div class="ghead" role="columnheader" style="border-left: 1px solid var(--border-strong)">{{h}}</div>
+</sc-for>
+</div>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+<div role="row" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--sunken); border-bottom: 1px solid var(--border); position: sticky; left: 0">
+<span class="ms" style="color: var(--brand-text)">apartment</span>
+<span role="rowheader" class="heading-sm" style="font-size: 15px">{{g.name}}</span>
+<span class="body-sm subtle">{{g.sub}}</span>
+<button class="btn btn-sm btn-secondary" style="margin-left: 8px" onClick="{{g.reserve}}"><span class="ms sm">select_all</span>Reserver hele {{g.name}}</button>
+</div>
+<sc-for list="{{g.rows}}" as="r" hint-placeholder-count="6">
+<div role="row" style="display: grid; grid-template-columns: 200px repeat(28, minmax(32px, 1fr))">
+<div class="roomcell" role="rowheader">
+<span class="rn" style="display: flex; align-items: center; gap: 4px">{{r.name}}<sc-if value="{{r.restricted}}" hint-placeholder-val="{{ false }}"><span class="limited" title="Begrenset – du har tilgang"><span class="ms">key</span>Begrenset</span></sc-if></span>
+<span class="rm">{{r.floor}}<span aria-hidden="true">·</span><span class="ms sm">group</span>{{r.cap}}<span aria-hidden="true">·</span><span class="ms sm" aria-label="{{r.mode}}">{{r.modeIcon}}</span></span>
+</div>
+<sc-for list="{{r.cells}}" as="c" hint-placeholder-count="28">
+<button class="{{c.cls}}" role="gridcell" aria-label="{{c.aria}}" aria-disabled="{{c.ariaDis}}" onClick="{{c.click}}">
+<sc-if value="{{c.showIcon}}" hint-placeholder-val="{{ false }}"><span class="ms {{c.fill}}">{{c.icon}}</span></sc-if>
+<sc-if value="{{c.showLabel}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; left: 26px; top: 0; bottom: 0; display: flex; align-items: center; font-size: 12px; font-weight: 500; white-space: nowrap; pointer-events: none; z-index: 1; width: {{c.lblW}}; overflow: hidden">{{c.label}}</span></sc-if>
+</button>
+</sc-for>
+</div>
+</sc-for>
+</sc-for>
+</div>
+</div>
+
+<p class="body-sm subtle"><span class="ms sm" style="vertical-align: -3px">keyboard</span> Piltaster flytter mellom tider og rom, Home/End går til start/slutt av dagen, Page Up/Down bytter dag, Enter eller mellomrom booker. <span class="ms sm" style="vertical-align: -3px">bolt</span> = godkjennes automatisk, <span class="ms sm" style="vertical-align: -3px">how_to_reg</span> = krever godkjenning.</p>
+</main>
+
+<sc-if value="{{dlgBook}}" hint-placeholder-val="{{ false }}">
+<div class="mask" onKeyDown="{{escClose}}">
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t">
+<div class="dialog-head">
+<h2 class="heading-lg" id="dlg-t">Ny booking</h2>
+<button class="btn btn-icon btn-text" aria-label="Lukk" onClick="{{closeDlg}}"><span class="ms">close</span></button>
+</div>
+<div class="dialog-body">
+<sc-if value="{{hasErrors}}" hint-placeholder-val="{{ false }}">
+<div class="msg msg-danger" role="alert"><span class="ms">error</span><div><strong>Rett opp dette før du sender:</strong>
+<sc-for list="{{errors}}" as="e" hint-placeholder-count="1"><div>· {{e}}</div></sc-for></div></div>
+</sc-if>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div class="field" style="grid-column: span 2"><label for="f-room">Rom</label>
+<select id="f-room" value="{{d.room}}" onChange="{{onRoom}}"><sc-for list="{{roomOpts}}" as="o" hint-placeholder-count="12"><option value="{{o.id}}">{{o.label}}</option></sc-for></select></div>
+<div class="field" style="grid-column: span 2"><label for="f-date">Dato</label><div class="inputlike" id="f-date"><span class="ms subtle">calendar_month</span>Torsdag 8. oktober 2026</div></div>
+<div class="field"><label for="f-s">Fra</label>
+<select id="f-s" value="{{d.s}}" onChange="{{onStart}}"><sc-for list="{{startOpts}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}">{{o.t}}</option></sc-for></select></div>
+<div class="field"><label for="f-e">Til</label>
+<select id="f-e" value="{{d.e}}" onChange="{{onEnd}}"><sc-for list="{{endOpts}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}">{{o.t}}</option></sc-for></select>
+<span class="hint">Åpent {{openTxt}}</span></div>
+<div class="field {{purposeInvalid}}" style="grid-column: span 2"><label for="f-p">Formål</label>
+<input id="f-p" value="{{purpose}}" onChange="{{onPurpose}}" maxlength="200" placeholder="F.eks. Styremøte i ungdomsarbeidet">
+<span class="hint" style="text-align: right">{{purposeLen}}/200</span></div>
+<div class="field {{peopleInvalid}}"><label for="f-n">Antall personer</label>
+<input id="f-n" type="number" min="1" value="{{people}}" onChange="{{onPeople}}">
+<span class="hint">Maks {{room.cap}} i dette rommet</span></div>
+</div>
+<div class="field"><span style="font-size: 13px; font-weight: 500">Gjentakelse</span>
+<div class="seg" role="group" aria-label="Gjentakelse">
+<sc-for list="{{repOpts}}" as="o" hint-placeholder-count="4"><button class="{{o.cls}}" aria-pressed="{{o.pressed}}" onClick="{{o.pick}}">{{o.t}}</button></sc-for>
+</div></div>
+<sc-if value="{{isRepeat}}" hint-placeholder-val="{{ false }}">
+<div class="card" style="padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; background: var(--sunken)">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap"><span class="heading-sm">Forhåndsvisning – 6 datoer</span><span class="body-sm subtle">Til og med 12. nov 2026 · maks 26 ganger</span></div>
+<sc-for list="{{preview}}" as="p" hint-placeholder-count="6">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span>{{p.date}}</span><span class="tag {{p.cls}}"><span class="ms">{{p.icon}}</span>{{p.st}}</span></div>
+</sc-for>
+<p class="body-sm subtle">Datoer utenfor åpningstid tas ikke med i serien.</p>
+</div>
+</sc-if>
+<div class="msg {{outcome.cls}}" role="status"><span class="ms">{{outcome.icon}}</span><div><strong>{{outcome.title}}</strong> <span>{{outcome.text}}</span></div></div>
+</div>
+<div class="dialog-foot">
+<button class="btn btn-secondary" onClick="{{closeDlg}}">Avbryt</button>
+<button class="btn btn-primary" onClick="{{send}}"><span class="ms">send</span>{{outcome.cta}}</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{dlgPart}}" hint-placeholder-val="{{ false }}">
+<div class="mask" onKeyDown="{{escClose}}">
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="part-t" style="max-width: 600px">
+<div class="dialog-head">
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 class="heading-lg" id="part-t">Reserver en hel del</h2><span class="body-sm subtle">Alle rommene i delen reserveres samtidig</span></div>
+<button class="btn btn-icon btn-text" aria-label="Lukk" onClick="{{closeDlg}}"><span class="ms">close</span></button>
+</div>
+<div class="dialog-body">
+<div class="field"><span style="font-size: 13px; font-weight: 500">Del</span>
+<div class="seg" role="group" aria-label="Del"><sc-for list="{{partOpts}}" as="o" hint-placeholder-count="2"><button class="{{o.cls}}" aria-pressed="{{o.pressed}}" onClick="{{o.pick}}"><span class="ms sm">apartment</span>{{o.t}}</button></sc-for></div></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div class="field"><label for="p-d">Dato</label><div class="inputlike" id="p-d">08.10.2026</div></div>
+<div class="field"><label for="p-s">Fra</label><select id="p-s" value="{{pt.s}}" onChange="{{onPartStart}}"><sc-for list="{{partStartOpts}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}">{{o.t}}</option></sc-for></select></div>
+<div class="field"><label for="p-e">Til</label><select id="p-e" value="{{pt.e}}" onChange="{{onPartEnd}}"><sc-for list="{{partEndOpts}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}">{{o.t}}</option></sc-for></select></div>
+<div class="field" style="grid-column: span 2"><label for="p-p">Formål</label><input id="p-p" placeholder="F.eks. Ungdomskveld med kafé og aktiviteter"></div>
+<div class="field"><label for="p-n">Antall personer</label><input id="p-n" type="number"></div>
+</div>
+<div class="card" style="overflow: hidden">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: var(--sunken); border-bottom: 1px solid var(--border); gap: 8px; flex-wrap: wrap"><span class="heading-sm">{{partName}} · {{partCount}} rom</span><span style="display: flex; gap: 6px"><span class="tag tag-success">{{partFree}} ledige</span><sc-if value="{{partHasBusy}}" hint-placeholder-val="{{ true }}"><span class="tag tag-warning">{{partBusy}} opptatt</span></sc-if></span></div>
+<sc-for list="{{partRooms}}" as="p" hint-placeholder-count="6">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid var(--border)"><span><span style="font-weight: 500">{{p.name}}</span> <span class="body-sm subtle">· {{p.floor}} · {{p.cap}} pers</span></span><span class="tag {{p.cls}}"><span class="ms">{{p.icon}}</span>{{p.st}}</span></div>
+</sc-for>
+</div>
+<div class="msg msg-info"><span class="ms">how_to_reg</span><span><strong>Går alltid til romansvarlig.</strong> Hele deler må godkjennes, også når alle rommene er ledige. Rom med begrenset tilgang tas også med.</span></div>
+<sc-if value="{{partHasBusy}}" hint-placeholder-val="{{ true }}"><div class="msg msg-warn"><span class="ms">warning</span><span>{{partBusy}} rom er opptatt eller forespurt i perioden. Romansvarlig avgjør konfliktene.</span></div></sc-if>
+</div>
+<div class="dialog-foot">
+<button class="btn btn-secondary" onClick="{{closeDlg}}">Avbryt</button>
+<button class="btn btn-primary" onClick="{{sendPart}}"><span class="ms">send</span>Send forespørsel for {{partName}}</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{dlgOwn}}" hint-placeholder-val="{{ false }}">
+<div class="mask" onKeyDown="{{escClose}}">
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="own-t" style="max-width: 460px">
+<div class="dialog-head"><h2 class="heading-lg" id="own-t">{{own.title}}</h2><button class="btn btn-icon btn-text" aria-label="Lukk" onClick="{{closeDlg}}"><span class="ms">close</span></button></div>
+<div class="dialog-body">
+<dl class="kv"><dt>Rom</dt><dd>{{own.room}}</dd><dt>Tid</dt><dd>Torsdag 8. okt, {{own.time}}</dd><dt>Status</dt><dd><span class="tag {{own.tagCls}}">{{own.status}}</span></dd></dl>
+<p class="subtle">Du kan avbestille frem til bookingen starter. Du trenger ikke oppgi grunn, og du får en SMS-kvittering.</p>
+</div>
+<div class="dialog-foot"><button class="btn btn-secondary" onClick="{{closeDlg}}">Behold</button><button class="btn btn-danger" onClick="{{cancelOwn}}"><span class="ms">event_busy</span>Avbestill</button></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+<div class="toast" role="status"><span class="ms fill" style="color: var(--green)">check_circle</span><div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><strong>{{toast.title}}</strong><span class="subtle">{{toast.text}}</span></div><button class="btn btn-icon btn-sm btn-text" aria-label="Lukk melding" onClick="{{closeToast}}"><span class="ms">close</span></button></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1360,"height":1180}}'>
+var ROOMS = [
+  { id: 'n1', b: 'N', fl: '1. etg', name: 'Hovedsalen', cap: 500, auto: false, open: [0, 28], items: [[0, 18, 'busy'], [22, 28, 'req']] },
+  { id: 'n2', b: 'N', fl: '1. etg', name: 'Sal A', cap: 120, auto: false, open: [0, 28], items: [[1, 17, 'busy'], [20, 26, 'busy']] },
+  { id: 'n3', b: 'N', fl: '1. etg', name: 'Sal B', cap: 80, auto: false, open: [0, 28], items: [[1, 17, 'busy'], [22, 26, 'mine']] },
+  { id: 'n4', b: 'N', fl: '1. etg', name: 'Kafeen', cap: 60, auto: true, open: [0, 28], items: [[0, 4, 'busy'], [8, 12, 'busy']] },
+  { id: 'n5', b: 'N', fl: '2. etg', name: 'Grupperom 1', cap: 12, auto: true, open: [0, 28], items: [[2, 16, 'busy'], [20, 23, 'busy']] },
+  { id: 'n6', b: 'N', fl: '2. etg', name: 'Grupperom 2', cap: 12, auto: true, open: [0, 28], items: [[2, 16, 'busy']] },
+  { id: 'n7', b: 'N', fl: '2. etg', name: 'Grupperom 3', cap: 8, auto: true, open: [0, 28], items: [[2, 12, 'busy'], [22, 24, 'req']] },
+  { id: 'a1', b: 'A', fl: '1. etg', name: 'AK-salen', cap: 150, auto: false, open: [0, 28], items: [[4, 10, 'busy']] },
+  { id: 'a2', b: 'A', fl: '1. etg', name: 'Ungdomskafeen', cap: 60, auto: true, open: [16, 28], items: [[20, 26, 'busy']] },
+  { id: 'a3', b: 'A', fl: '1. etg', name: 'Kjøkkenet', cap: 15, auto: false, restricted: true, open: [0, 28], items: [[6, 10, 'busy'], [18, 21, 'myreq']] },
+  { id: 'a4', b: 'A', fl: '2. etg', name: 'Møterom AK1', cap: 10, auto: true, open: [0, 28], items: [[0, 3, 'busy'], [18, 22, 'busy']] },
+  { id: 'a5', b: 'A', fl: '2. etg', name: 'Møterom AK2', cap: 10, auto: true, open: [0, 24], items: [[6, 10, 'closed', 'Stengt · Rengjøring'], [18, 20, 'busy']] },
+  { id: 'a6', b: 'A', fl: '2. etg', name: 'Studio', cap: 6, auto: false, restricted: true, open: [4, 24], items: [[10, 14, 'busy']] }
+];
+var PARTS = { N: { name: 'Nybygget', sub: '8 rom · 2 etasjer · konferanse på dagtid' }, A: { name: 'AK-bygget', sub: '6 rom · 2 etasjer · mye brukt av ungdom' } };
+var LBL = { free: 'Ledig', busy: 'Opptatt', req: 'Forespurt', closed: 'Stengt', mine: 'Din booking', myreq: 'Venter på svar' };
+var ICON = { free: 'add', busy: 'block', req: 'schedule', closed: 'lock', mine: 'check_circle', myreq: 'hourglass_top' };
+var PRI = { free: 1, req: 2, myreq: 3, busy: 4, mine: 5, closed: 6 };
+function T(i) { var m = 480 + i * 30; var h = Math.floor(m / 60); return (h < 10 ? '0' : '') + h + ':' + (m % 60 ? '30' : '00'); }
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { extra: [], cancelled: {}, dlg: null, part: null, own: null, toast: null, purpose: '', people: '', rep: 'none', errors: [], dark: null };
+  }
+  items(room) {
+    var self = this;
+    var list = room.items.map(function (it) { return { s: it[0], e: it[1], st: it[2], label: it[3] }; })
+      .concat(this.state.extra.filter(function (x) { return x.room === room.id; }));
+    return list.filter(function (it) { return !self.state.cancelled[room.id + '-' + it.s]; });
+  }
+  statusAt(room, i) {
+    if (i < room.open[0] || i >= room.open[1]) return { st: 'closed' };
+    var best = { st: 'free' };
+    this.items(room).forEach(function (it) { if (i >= it.s && i < it.e && PRI[it.st] > PRI[best.st]) best = it; });
+    return best;
+  }
+  rangeStatus(room, s, e) {
+    var worst = 'free';
+    for (var i = s; i < e; i++) { var x = this.statusAt(room, i).st; if (PRI[x] > PRI[worst]) worst = x; }
+    return worst;
+  }
+  openBook(room, i) {
+    // Kveldsbookinger er vanligst: fra kl. 16 foreslås resten av kvelden, ellers 2 timer. Frem til neste opptatte tid.
+    var e = i >= 16 ? room.open[1] : Math.min(i + 4, room.open[1]);
+    for (var k = i + 1; k < e; k++) { if (this.statusAt(room, k).st !== 'free') { e = k; break; } }
+    this.setState({ dlg: { room: room.id, s: i, e: e }, part: null, own: null, purpose: '', people: '', rep: 'none', errors: [] });
+  }
+  renderVals() {
+    var self = this, st = this.state;
+    var dark = st.dark === null ? !!this.props.dark : st.dark;
+    var hours = []; for (var h = 8; h < 22; h++) hours.push((h < 10 ? '0' : '') + h + ':00');
+    function rowFor(room) {
+      var cells = [], stats = [];
+      for (var i = 0; i < 28; i++) stats.push(self.statusAt(room, i));
+      for (var j = 0; j < 28; j++) {
+        var s = stats[j], first = j === 0 || stats[j - 1].st !== s.st || stats[j - 1] !== s && s.st !== 'free' && s.st !== 'closed';
+        var len = 1; while (j + len < 28 && stats[j + len].st === s.st && (stats[j + len] === s || s.st === 'closed')) len++;
+        var sel = st.dlg && st.dlg.room === room.id && j >= st.dlg.s && j < st.dlg.e && s.st === 'free';
+        var cls = 'slot s-' + s.st + (j % 2 === 0 ? ' hour' : '') + (sel ? ' s-sel' : '');
+        var label = s.label || (s.st === 'busy' || s.st === 'req' ? LBL[s.st] + ' til ' + T(j + len) : LBL[s.st]);
+        (function (idx, stat, cls, label, first, len) {
+          cells.push({
+            cls: cls, icon: ICON[stat.st], fill: stat.st === 'mine' ? 'fill' : '',
+            showIcon: stat.st === 'free' || first, showLabel: first && stat.st !== 'free' && len >= 3,
+            label: label, lblW: 'calc(' + (len * 100) + '% - 30px)',
+            aria: room.name + ', ' + T(idx) + '–' + T(idx + 1) + ', ' + label,
+            ariaDis: stat.st === 'free' || stat.st === 'mine' || stat.st === 'myreq' ? 'false' : 'true',
+            click: function () {
+              if (stat.st === 'free') self.openBook(room, idx);
+              else if (stat.st === 'mine' || stat.st === 'myreq') self.setState({ own: { room: room, it: stat }, dlg: null, part: null });
+            }
+          });
+        })(j, s, cls, label, first, len);
+      }
+      return { name: room.name, cap: room.cap, floor: room.fl, restricted: !!room.restricted, mode: room.auto ? 'Automatisk godkjenning' : 'Krever godkjenning', modeIcon: room.auto ? 'bolt' : 'how_to_reg', cells: cells };
+    }
+    var groups = ['N', 'A'].map(function (b) {
+      return { name: PARTS[b].name, sub: PARTS[b].sub, rows: ROOMS.filter(function (r) { return r.b === b; }).map(rowFor),
+        reserve: function () { self.setState({ part: { b: b, s: 20, e: 28 }, dlg: null, own: null }); } };
+    });
+
+    var d = st.dlg, room = d ? ROOMS.filter(function (r) { return r.id === d.room; })[0] : ROOMS[0];
+    var startOpts = [], endOpts = [], conflict = false;
+    if (d) {
+      for (var a = room.open[0]; a < room.open[1]; a++) startOpts.push({ v: String(a), t: T(a) });
+      for (var b2 = d.s + 1; b2 <= room.open[1]; b2++) endOpts.push({ v: String(b2), t: T(b2) });
+      conflict = self.rangeStatus(room, d.s, d.e) !== 'free';
+    }
+    var outcome = conflict
+      ? { cls: 'msg-warn', icon: 'warning', title: 'Tidspunktet overlapper en annen booking.', text: 'Den sendes til romansvarlig som en konfliktforespørsel. Du får SMS når den er behandlet.', cta: 'Send konfliktforespørsel', st: 'myreq' }
+      : room.auto
+        ? { cls: 'msg-success', icon: 'bolt', title: 'Bekreftes med en gang.', text: 'Rommet er ledig og godkjennes automatisk.', cta: 'Book rommet', st: 'mine' }
+        : { cls: 'msg-info', icon: 'how_to_reg', title: 'Krever godkjenning.', text: 'Bookingen sendes som forespørsel til romansvarlig. Du får SMS når den er behandlet.', cta: 'Send forespørsel', st: 'myreq' };
+    var reps = [['none', 'Ingen'], ['w', 'Ukentlig'], ['2w', 'Annenhver uke'], ['m', 'Månedlig']];
+    var preview = [['Tor 8. okt', 'free'], ['Tor 15. okt', 'free'], ['Tor 22. okt', 'conflict'], ['Tor 29. okt', 'free'], ['Tor 5. nov', 'outside'], ['Tor 12. nov', 'free']].map(function (p) {
+      var m = { free: ['Ledig', 'tag-success', 'check'], conflict: ['Konflikt', 'tag-warning', 'warning'], outside: ['Utenfor åpningstid – tas ikke med', 'tag', 'block'] }[p[1]];
+      return { date: p[0], st: m[0], cls: m[1], icon: m[2] };
+    });
+    var own = st.own ? {
+      title: st.own.it.st === 'mine' ? 'Din booking' : 'Venter på svar', room: st.own.room.name,
+      time: T(st.own.it.s) + '–' + T(st.own.it.e), status: st.own.it.st === 'mine' ? 'Bekreftet' : 'Venter på svar',
+      tagCls: st.own.it.st === 'mine' ? 'tag-success' : 'tag-warning'
+    } : {};
+
+    var pt = st.part || { b: 'N', s: 20, e: 28 };
+    var PM = { free: ['Ledig', 'tag-success', 'check'], busy: ['Opptatt', 'tag-warning', 'block'], req: ['Forespurt', 'tag-warning', 'schedule'], closed: ['Delvis stengt', '', 'lock'], mine: ['Din booking', 'tag-brand', 'check_circle'], myreq: ['Venter på svar', 'tag-brand', 'hourglass_top'] };
+    var partRooms = ROOMS.filter(function (r) { return r.b === pt.b; }).map(function (r) { var x = self.rangeStatus(r, pt.s, pt.e); var m = PM[x]; return { name: r.name, floor: r.fl, cap: r.cap, st: m[0], cls: m[1], icon: m[2], free: x === 'free' || x === 'closed', id: r.id }; });
+    var partFree = partRooms.filter(function (r) { return r.free; }).length, partBusy = partRooms.length - partFree;
+    var ps = [], pe = []; for (var q = 0; q < 28; q++) ps.push({ v: String(q), t: T(q) }); for (var q2 = pt.s + 1; q2 <= 28; q2++) pe.push({ v: String(q2), t: T(q2) });
+
+    return {
+      escClose: function (e) { if (e.key === 'Escape') self.setState({ dlg: null, own: null, part: null }); },
+      themeCls: dark ? 'dark' : '', themeIcon: dark ? 'light_mode' : 'dark_mode',
+      toggleTheme: function () { self.setState({ dark: !dark }); },
+      hours: hours, groups: groups,
+      dlgBook: !!d, dlgOwn: !!st.own, dlgPart: !!st.part, d: d ? { room: d.room, s: String(d.s), e: String(d.e) } : {}, room: room,
+      roomOpts: ROOMS.map(function (r) { return { id: r.id, label: r.name + ' – ' + PARTS[r.b].name + ', ' + r.fl + ' (maks ' + r.cap + ')' }; }),
+      startOpts: startOpts, endOpts: endOpts, openTxt: T(room.open[0]) + '–' + T(room.open[1]),
+      purpose: st.purpose, purposeLen: st.purpose.length, people: st.people,
+      purposeInvalid: st.errors.length && !st.purpose.trim() ? 'invalid' : '',
+      peopleInvalid: st.errors.length && (!(+st.people > 0) || +st.people > room.cap) ? 'invalid' : '',
+      errors: st.errors, hasErrors: st.errors.length > 0,
+      repOpts: reps.map(function (r) { return { t: r[1], cls: st.rep === r[0] ? 'on' : '', pressed: st.rep === r[0] ? 'true' : 'false', pick: function () { self.setState({ rep: r[0] }); } }; }),
+      isRepeat: st.rep !== 'none', preview: preview, outcome: outcome, own: own,
+      pt: { s: String(pt.s), e: String(pt.e) }, partName: PARTS[pt.b].name, partRooms: partRooms, partCount: partRooms.length, partFree: partFree, partBusy: partBusy, partHasBusy: partBusy > 0,
+      partStartOpts: ps, partEndOpts: pe,
+      partOpts: ['N', 'A'].map(function (b) { return { t: PARTS[b].name, cls: pt.b === b ? 'on' : '', pressed: pt.b === b ? 'true' : 'false', pick: function () { self.setState({ part: { b: b, s: pt.s, e: pt.e } }); } }; }),
+      onPartStart: function (e) { var s = +e.target.value; self.setState({ part: { b: pt.b, s: s, e: Math.max(pt.e, s + 1) } }); },
+      onPartEnd: function (e) { self.setState({ part: { b: pt.b, s: pt.s, e: +e.target.value } }); },
+      sendPart: function () {
+        var add = partRooms.map(function (r) { return { room: r.id, s: pt.s, e: pt.e, st: 'myreq' }; });
+        self.setState({ extra: st.extra.concat(add), part: null, toast: { title: 'Forespørsel sendt for hele ' + PARTS[pt.b].name, text: partRooms.length + ' rom, ' + T(pt.s) + '–' + T(pt.e) + '. Du får SMS når romansvarlig har svart.' } });
+      },
+      onRoom: function (e) { var r = ROOMS.filter(function (q) { return q.id === e.target.value; })[0]; var s = Math.max(d.s, r.open[0]); s = Math.min(s, r.open[1] - 1); self.setState({ dlg: { room: r.id, s: s, e: Math.min(Math.max(d.e, s + 1), r.open[1]) } }); },
+      onStart: function (e) { var s = +e.target.value; self.setState({ dlg: { room: d.room, s: s, e: Math.max(d.e, s + 1) } }); },
+      onEnd: function (e) { self.setState({ dlg: { room: d.room, s: d.s, e: +e.target.value } }); },
+      onPurpose: function (e) { self.setState({ purpose: e.target.value }); },
+      onPeople: function (e) { self.setState({ people: e.target.value }); },
+      closeDlg: function () { self.setState({ dlg: null, own: null, part: null }); },
+      send: function () {
+        var errs = [];
+        if (!st.purpose.trim()) errs.push('Skriv inn formål.');
+        if (!(+st.people > 0)) errs.push('Oppgi antall personer.');
+        else if (+st.people > room.cap) errs.push('Antall personer er over kapasiteten (' + room.cap + ').');
+        if (errs.length) { self.setState({ errors: errs }); return; }
+        var t = outcome.st === 'mine'
+          ? { title: 'Booking bekreftet', text: room.name + ', ' + T(d.s) + '–' + T(d.e) + '. Du finner den under Mine bookinger.' }
+          : { title: 'Forespørsel sendt', text: room.name + ', ' + T(d.s) + '–' + T(d.e) + '. Du får SMS når romansvarlig har svart.' };
+        self.setState({ extra: st.extra.concat([{ room: d.room, s: d.s, e: d.e, st: outcome.st }]), dlg: null, toast: t, errors: [] });
+      },
+      cancelOwn: function () {
+        var c = Object.assign({}, st.cancelled); c[st.own.room.id + '-' + st.own.it.s] = true;
+        self.setState({ cancelled: c, own: null, toast: { title: 'Avbestilt', text: 'Du får en SMS-kvittering.' } });
+      },
+      hasToast: !!st.toast, toast: st.toast || {}, closeToast: function () { self.setState({ toast: null }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

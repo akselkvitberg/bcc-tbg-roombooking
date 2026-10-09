@@ -1,0 +1,194 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Dagsoversikt.dc.html": {
+      "expand": "fill",
+      "h": 1180,
+      "is_interactive": true,
+      "title": "Desktop · Dagsoversikt (rutenett)",
+      "w": 1360,
+      "x": 1520,
+      "y": 1300
+    },
+    "Foresporsler.dc.html": {
+      "expand": "fill",
+      "h": 1500,
+      "is_interactive": true,
+      "title": "Romansvarlig · Forespørsler",
+      "w": 1360,
+      "x": 0,
+      "y": 3000
+    },
+    "Kart.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "title": "Desktop · Kart over rommene",
+      "w": 1360,
+      "x": 4400,
+      "y": 1300
+    },
+    "Main.dc.html": {
+      "expand": "fill",
+      "h": 1240,
+      "is_interactive": true,
+      "title": "Desktop · Book rom (flere rom, maler, velg bort datoer)",
+      "w": 1440,
+      "x": 0,
+      "y": 1300
+    },
+    "MineBookinger.dc.html": {
+      "expand": "fill",
+      "h": 1300,
+      "is_interactive": true,
+      "title": "Desktop · Mine bookinger (oversikt for ledere)",
+      "w": 1360,
+      "x": 2960,
+      "y": 1300
+    },
+    "Mobil.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Mobil 1 · Finn rom (resultater med en gang)",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "MobilDetaljer.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Mobil 3 · Detaljer, type og gjentakelse",
+      "w": 390,
+      "x": 1410,
+      "y": 0
+    },
+    "MobilFilter.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Mobil 1b · Endre dag, tid og antall",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "MobilHeltBygg.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Mobil · Hele bygget",
+      "w": 390,
+      "x": 3290,
+      "y": 0
+    },
+    "MobilKart.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Mobil · Kart",
+      "w": 390,
+      "x": 2820,
+      "y": 0
+    },
+    "MobilKvittering.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Mobil 4 · Kvittering",
+      "w": 390,
+      "x": 1880,
+      "y": 0
+    },
+    "MobilMine.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Mobil 5 · Mine bookinger",
+      "w": 390,
+      "x": 2350,
+      "y": 0
+    },
+    "MobilRom.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Mobil 2 · Rom og tid",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    },
+    "Oversikt.dc.html": {
+      "expand": "fill",
+      "h": 1180,
+      "is_interactive": true,
+      "title": "Romansvarlig · Alle bookinger (dra og slipp)",
+      "w": 1360,
+      "x": 1440,
+      "y": 3000
+    },
+    "Rom.dc.html": {
+      "expand": "fill",
+      "h": 1400,
+      "is_interactive": true,
+      "title": "Admin · Rom, tilgang og typer",
+      "w": 1360,
+      "x": 2880,
+      "y": 3000
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-08T19:30:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "m1": {
+      "fill": "teal",
+      "maxH": 600,
+      "text": "Mobilflyten er én sammenhengende prototype – trykk Play på hvilken som helst telefon.\n\n1. Resultater vises med en gang (i kveld, forrige antall). Endre dag/tid/antall i et ark.\n2. Trykk et rom. Delvis ledige rom åpnes med den ledige tiden valgt.\n3. Type, formål, gjentakelse – fjern haken for datoer dere ikke trenger.\n4. Kvittering.\n5. Mine bookinger: svar på forslag, hopp over en dato, avbestill.\n\nKart og Hele bygget finnes også på mobil.",
+      "w": 360,
+      "x": 3760,
+      "y": 0
+    },
+    "t0": {
+      "kind": "title1",
+      "maxW": 4120,
+      "text": "Mobil – booke rom for en kveld (hovedflyt)",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "t1": {
+      "kind": "title1",
+      "maxW": 5760,
+      "text": "Desktop – for ledere (ungdomsleder, styreleder, dugnadsleder)",
+      "w": 240,
+      "x": 0,
+      "y": 1000
+    },
+    "t2": {
+      "kind": "title1",
+      "maxW": 4240,
+      "text": "Romansvarlig og admin – forespørsler, alle bookinger, romoppsett",
+      "w": 240,
+      "x": 0,
+      "y": 2700
+    }
+  },
+  "order": [
+    "Mobil.dc.html",
+    "MobilFilter.dc.html",
+    "MobilRom.dc.html",
+    "MobilDetaljer.dc.html",
+    "MobilKvittering.dc.html",
+    "MobilMine.dc.html",
+    "MobilKart.dc.html",
+    "MobilHeltBygg.dc.html",
+    "Main.dc.html",
+    "Dagsoversikt.dc.html",
+    "MineBookinger.dc.html",
+    "Kart.dc.html",
+    "Foresporsler.dc.html",
+    "Oversikt.dc.html",
+    "Rom.dc.html"
+  ],
+  "pages": [],
+  "title": "Jarlsberg rombooking"
+}

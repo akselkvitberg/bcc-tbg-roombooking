@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>Alle bookinger – romansvarlig</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="/_blob/e895aa84635a929158b5e89483b2e1bb">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&amp;display=block">
+<style>
+body{margin:0}
+a{color:#0C625C}a:hover{color:#014D49}
+.blk-konf{background:var(--purple-soft);color:var(--purple-text);box-shadow:inset 3px 0 0 #9A82DA}
+</style>
+</helmet>
+<div class="bcc-root {{themeCls}}" style="position: relative; min-height: 960px; display: flex; flex-direction: column">
+<header class="topnav">
+<a class="appmark" href="Main.dc.html"><span class="mark"><span class="ms">meeting_room</span></span>Jarlsberg rombooking</a>
+<nav class="navlinks" aria-label="Hovedmeny">
+<a class="navlink" href="Main.dc.html"><span class="ms">add_circle</span>Book</a>
+<a class="navlink" href="MineBookinger.dc.html"><span class="ms">event_note</span>Mine bookinger</a>
+<span aria-hidden="true" style="width: 1px; height: 24px; background: var(--border); align-self: center; margin: 0 6px"></span>
+<span class="label-sm subtle" style="align-self: center; margin-right: 2px">ADMINISTRASJON</span>
+<a class="navlink" href="Foresporsler.dc.html"><span class="ms">inbox</span>Forespørsler<span class="badge">7</span></a>
+<a class="navlink active" href="Oversikt.dc.html" aria-current="page"><span class="ms">view_timeline</span>Alle bookinger</a>
+<a class="navlink {{navRom}}" href="Rom.dc.html"><span class="ms">tune</span>Rom og tilgang</a>
+<a class="navlink" href="Rom.dc.html"><span class="ms">sms</span>SMS-logg</a>
+</nav>
+<div style="display: flex; align-items: center; gap: 12px"><span class="tag tag-brand">Romansvarlig</span><span class="avatar" aria-hidden="true" style="background: #98afb0">OB</span><span style="font-weight: 500">Ola Berg</span></div>
+</header>
+
+<main style="width: 100%; max-width: 1360px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px"><h1 class="heading-2xl">Alle bookinger</h1><p class="subtle">Bekreftede bookinger med navn og formål, også konferanser. Dra en booking for å flytte den.</p></div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<button class="btn btn-secondary btn-icon" aria-label="Forrige dag"><span class="ms">chevron_left</span></button>
+<div class="inputlike" style="width: 260px; height: 40px; padding: 0 12px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--surface)"><span class="ms subtle">calendar_month</span><span style="flex: 1">Torsdag 8. oktober 2026</span><span class="tag">Uke 41</span></div>
+<button class="btn btn-secondary btn-icon" aria-label="Neste dag"><span class="ms">chevron_right</span></button>
+<button class="btn btn-secondary">I dag</button>
+</div>
+</div>
+
+<div class="msg msg-warn"><span class="ms">warning</span><div style="flex: 1"><strong>2 konflikter mellom konferanse og kveldsaktiviteter denne uken.</strong> <span>Sal A fredag og Kjøkkenet i dag venter på avgjørelse.</span></div><a class="btn btn-sm btn-text" href="Foresporsler.dc.html">Til forespørsler<span class="ms sm">arrow_forward</span></a></div>
+
+<div class="legend">
+<span class="lg"><span class="sw blk-konf" style="border: 0"><span class="ms">business_center</span></span>Konferanse (konferanseansvarlig)</span>
+<span class="lg"><span class="sw blk-ok" style="border: 0"></span>Medlemsbooking (ikon viser type)</span>
+<span class="lg"><span class="sw s-closed"><span class="ms">lock</span></span>Stengt</span>
+<span class="lg"><span class="ms sm" style="color: var(--brand-text)">key</span>Begrenset rom</span>
+</div>
+
+<div class="gridwrap">
+<div style="min-width: 1100px">
+<div style="display: grid; grid-template-columns: 200px repeat(14, minmax(64px, 1fr))">
+<div class="ghead" style="padding-left: 12px; position: sticky; left: 0; z-index: 3; border-right: 1px solid var(--border)">Rom</div>
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="14"><div class="ghead" style="border-left: 1px solid var(--border-strong)">{{h}}</div></sc-for>
+</div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="14">
+<sc-if value="{{r.head}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--sunken); border-bottom: 1px solid var(--border); position: sticky; left: 0"><span class="ms" style="color: var(--brand-text)">apartment</span><span class="heading-sm" style="font-size: 15px">{{r.headTxt}}</span><span class="body-sm subtle">{{r.headSub}}</span></div></sc-if>
+<div style="display: grid; grid-template-columns: 200px minmax(0, 1fr)">
+<div class="roomcell" style="min-height: 60px"><span class="rn" style="display: flex; align-items: center; gap: 4px">{{r.name}}<sc-if value="{{r.restricted}}" hint-placeholder-val="{{ false }}"><span class="ms sm" style="color: var(--brand-text)" aria-label="Begrenset tilgang">key</span></sc-if></span><span class="rm">{{r.fl}}<span aria-hidden="true">·</span><span class="ms sm">group</span>{{r.cap}}</span></div>
+<div onDragOver="{{r.over}}" onDrop="{{r.drop}}" onDragLeave="{{r.leave}}" style="position: relative; border-bottom: 1px solid var(--border); background-image: repeating-linear-gradient(90deg, var(--border-strong) 0 1px, transparent 1px calc(100% / 14)), repeating-linear-gradient(90deg, var(--border) 0 1px, transparent 1px calc(100% / 28)); {{r.dropBg}}">
+<sc-for list="{{r.closed}}" as="c" hint-placeholder-count="1"><div class="s-closed" aria-hidden="true" style="position: absolute; top: 0; bottom: 0; left: {{c.l}}; width: {{c.w}}; display: flex; align-items: center; padding-left: 8px; font-size: 12px; overflow: hidden; white-space: nowrap">{{c.t}}</div></sc-for>
+<sc-for list="{{r.blocks}}" as="b" hint-placeholder-count="2">
+<button class="blk {{b.cls}}" draggable="true" onDragStart="{{b.dragStart}}" onDragEnd="{{b.dragEnd}}" onClick="{{b.open}}" aria-label="{{b.aria}}" style="left: calc({{b.l}} + 3px); width: calc({{b.w}} - 6px); {{b.dragStyle}}"><b style="display: flex; align-items: center; gap: 4px"><span class="ms sm" aria-hidden="true">{{b.tIcon}}</span>{{b.who}}</b><span>{{b.time}} · {{b.purpose}}</span></button>
+</sc-for>
+<sc-if value="{{r.hasMarker}}" hint-placeholder-val="{{ false }}">
+<div aria-hidden="true" style="position: absolute; top: 4px; bottom: 4px; left: {{r.ml}}; width: {{r.mw}}; border: 2px dashed var(--brand); border-radius: 6px; background: var(--brand-soft); pointer-events: none"></div>
+<div aria-hidden="true" style="position: absolute; top: -14px; left: {{r.ml}}; transform: translateX(-50%); background: var(--brand); color: var(--on-brand); font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; pointer-events: none; z-index: 4">{{r.mt}}</div>
+</sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+<p class="body-sm subtle"><span class="ms sm" style="vertical-align: -3px">keyboard</span> Tastatur: åpne en booking med Enter og velg Flytt… eller Avbestill…. Skjermleser leser navn, formål og antall personer.</p>
+</main>
+
+<sc-if value="{{dlgDetail}}" hint-placeholder-val="{{ false }}">
+<div class="mask" onKeyDown="{{escClose}}"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="bd-t" style="max-width: 480px">
+<div class="dialog-head"><h2 class="heading-lg" id="bd-t">{{cur.who}}</h2><button class="btn btn-icon btn-text" aria-label="Lukk" onClick="{{close}}"><span class="ms">close</span></button></div>
+<div class="dialog-body"><dl class="kv" style="font-size: 14px"><dt>Type</dt><dd><span class="ttag {{cur.typeCls}}"><span class="ms">{{cur.typeIcon}}</span>{{cur.type}}</span></dd><dt>Rom</dt><dd>{{cur.room}}</dd><dt>Tid</dt><dd>Torsdag 8. okt, {{cur.time}}</dd><dt>Formål</dt><dd>{{cur.purpose}}</dd><dt>Personer</dt><dd>{{cur.people}}</dd><dt>Mobil</dt><dd>{{cur.phone}}</dd></dl></div>
+<div class="dialog-foot"><button class="btn btn-danger-outline" onClick="{{openCancel}}"><span class="ms">event_busy</span>Avbestill…</button><button class="btn btn-primary" onClick="{{openMove}}"><span class="ms">open_with</span>Flytt…</button></div>
+</div></div>
+</sc-if>
+
+<sc-if value="{{dlgMove}}" hint-placeholder-val="{{ false }}">
+<div class="mask" onKeyDown="{{escClose}}"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mv-t">
+<div class="dialog-head"><h2 class="heading-lg" id="mv-t">Flytt booking</h2><button class="btn btn-icon btn-text" aria-label="Lukk" onClick="{{close}}"><span class="ms">close</span></button></div>
+<div class="dialog-body">
+<div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 8px; background: var(--sunken); font-size: 13px; flex-wrap: wrap"><span><span class="subtle">Fra</span> <strong style="font-weight: 600">{{cur.room}}, {{cur.time}}</strong></span><span class="ms sm subtle">arrow_forward</span><span><span class="subtle">Til</span> <strong style="font-weight: 600; color: var(--brand-text)">{{mv.room}}, {{mv.time}}</strong></span></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div class="field" style="grid-column: span 3"><label for="mr">Nytt rom</label><select id="mr"><option>{{mv.room}}</option></select></div>
+<div class="field"><label for="md">Dato</label><div class="inputlike" id="md">08.10.2026</div></div>
+<div class="field"><label for="ms">Fra</label><select id="ms"><option>{{mv.from}}</option></select></div>
+<div class="field"><label for="me">Til</label><select id="me"><option>{{mv.to}}</option></select><span class="hint">Samme lengde</span></div>
+</div>
+<div class="field"><label for="mw">Begrunnelse (sendes på SMS til {{cur.who}})</label><textarea id="mw" rows="3" placeholder="F.eks. Rommet trengs til et større arrangement."></textarea><span class="hint">Påkrevd</span></div>
+<sc-if value="{{cur.series}}" hint-placeholder-val="{{ false }}"><div class="msg msg-info"><span class="ms">repeat</span><span>Bookingen er del av en serie. Bare denne datoen flyttes.</span></div></sc-if>
+</div>
+<div class="dialog-foot"><button class="btn btn-secondary" onClick="{{close}}">Avbryt</button><button class="btn btn-primary" onClick="{{doMove}}"><span class="ms">send</span>Flytt og send SMS</button></div>
+</div></div>
+</sc-if>
+
+<sc-if value="{{dlgCancel}}" hint-placeholder-val="{{ false }}">
+<div class="mask" onKeyDown="{{escClose}}"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="cx-t" style="max-width: 500px">
+<div class="dialog-head"><h2 class="heading-lg" id="cx-t">Avbestill booking</h2><button class="btn btn-icon btn-text" aria-label="Lukk" onClick="{{close}}"><span class="ms">close</span></button></div>
+<div class="dialog-body">
+<p class="subtle">{{cur.who}} · {{cur.room}}, {{cur.time}}</p>
+<div class="field"><label for="cw">Begrunnelse (sendes på SMS)</label><textarea id="cw" rows="3"></textarea><span class="hint">Påkrevd</span></div>
+<label class="check"><input type="checkbox">Foreslå et annet rom eller tid samtidig</label>
+</div>
+<div class="dialog-foot"><button class="btn btn-secondary" onClick="{{close}}">Behold</button><button class="btn btn-danger" onClick="{{doCancel}}">Avbestill og send SMS</button></div>
+</div></div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+<div class="toast" role="status"><span class="ms fill" style="color: var(--green)">check_circle</span><div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><strong>{{toast.title}}</strong><span class="subtle">{{toast.text}}</span></div><button class="btn btn-icon btn-sm btn-text" aria-label="Lukk melding" onClick="{{closeToast}}"><span class="ms">close</span></button></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1360,"height":960}}'>
+var ROOMS = [
+  { id: 'n1', b: 'N', fl: '1. etg', name: 'Hovedsalen', cap: 500, open: [0, 28] }, { id: 'n2', b: 'N', fl: '1. etg', name: 'Sal A', cap: 120, open: [0, 28] },
+  { id: 'n3', b: 'N', fl: '1. etg', name: 'Sal B', cap: 80, open: [0, 28] }, { id: 'n4', b: 'N', fl: '1. etg', name: 'Kafeen', cap: 60, open: [0, 28] },
+  { id: 'n5', b: 'N', fl: '2. etg', name: 'Grupperom 1', cap: 12, open: [0, 28] }, { id: 'n6', b: 'N', fl: '2. etg', name: 'Grupperom 2', cap: 12, open: [0, 28] },
+  { id: 'n7', b: 'N', fl: '2. etg', name: 'Grupperom 3', cap: 8, open: [0, 28] }, { id: 'n8', b: 'N', fl: '2. etg', name: 'Styrerommet', cap: 16, open: [0, 28], restricted: true },
+  { id: 'a1', b: 'A', fl: '1. etg', name: 'AK-salen', cap: 150, open: [0, 28] }, { id: 'a2', b: 'A', fl: '1. etg', name: 'Ungdomskafeen', cap: 60, open: [16, 28] },
+  { id: 'a3', b: 'A', fl: '1. etg', name: 'Kjøkkenet', cap: 15, open: [0, 28], restricted: true }, { id: 'a4', b: 'A', fl: '2. etg', name: 'Møterom AK1', cap: 10, open: [0, 28] },
+  { id: 'a5', b: 'A', fl: '2. etg', name: 'Møterom AK2', cap: 10, open: [0, 24], block: [6, 10, 'Rengjøring'] }, { id: 'a6', b: 'A', fl: '2. etg', name: 'Studio', cap: 6, open: [4, 24], restricted: true }
+];
+var TYN = { ungdom: ['Ungdom', 'groups'], mote: ['Møte', 'forum'], ovelse: ['Øvelse', 'music_note'], dugnad: ['Dugnad', 'construction'], arr: ['Arrangement', 'celebration'], annet: ['Annet', 'label'] };
+var TYPEBY = { 3: 'arr', 5: 'ovelse', 6: 'mote', 9: 'mote', 12: 'mote', 14: 'ungdom', 15: 'ungdom', 16: 'annet', 17: 'mote', 18: 'mote', 19: 'mote', 20: 'ovelse' };
+var PARTS = { N: ['Nybygget', '8 rom · konferanse på dagtid'], A: ['AK-bygget', '6 rom · ungdom og kveldsaktiviteter'] };
+var EF = { who: 'Norsk Energiforum', phone: 'Hilde Sætre, konferanseavdelingen', konf: true };
+var BK = [
+  Object.assign({ id: 1, room: 'n1', s: 0, e: 18, purpose: 'Plenum, dag 1', people: 420 }, EF),
+  Object.assign({ id: 2, room: 'n2', s: 1, e: 17, purpose: 'Parallellsesjon 1', people: 110 }, EF),
+  { id: 3, room: 'n2', s: 20, e: 26, who: 'Hans Vik', purpose: 'Seniortreff', people: 35, phone: '+47 922 18 004' },
+  Object.assign({ id: 4, room: 'n3', s: 1, e: 17, purpose: 'Parallellsesjon 2', people: 70 }, EF),
+  { id: 5, room: 'n3', s: 22, e: 26, who: 'Ingrid Hansen', purpose: 'Korøvelse, sopranene', people: 18, phone: '+47 912 34 567' },
+  { id: 6, room: 'n4', s: 0, e: 4, who: 'Lars Holm', purpose: 'Frokostmøte, næringslivsnettverk', people: 20, phone: '+47 950 71 336' },
+  Object.assign({ id: 7, room: 'n4', s: 8, e: 12, purpose: 'Lunsj', people: 60 }, EF),
+  Object.assign({ id: 8, room: 'n5', s: 2, e: 16, purpose: 'Workshop A', people: 12 }, EF),
+  { id: 9, room: 'n5', s: 20, e: 23, who: 'Siv Lund', purpose: 'Menighetsrådet', people: 11, phone: '+47 936 02 114', series: true },
+  Object.assign({ id: 10, room: 'n6', s: 2, e: 16, purpose: 'Workshop B', people: 12 }, EF),
+  Object.assign({ id: 11, room: 'n7', s: 2, e: 12, purpose: 'Workshop C', people: 8 }, EF),
+  { id: 12, room: 'n8', s: 4, e: 8, who: 'Kari Moe', purpose: 'Styremøte i stiftelsen', people: 9, phone: '+47 917 40 221' },
+  { id: 13, room: 'a1', s: 4, e: 10, who: 'Vestfold Skoleforum', purpose: 'Fagdag for lærere', people: 140, phone: 'Hilde Sætre, konferanseavdelingen', konf: true },
+  { id: 14, room: 'a1', s: 21, e: 28, who: 'Emil Sand', purpose: 'Ungdomskveld', people: 90, phone: '+47 469 15 283' },
+  { id: 15, room: 'a2', s: 20, e: 26, who: 'Emil Sand', purpose: 'Ungdomsklubb', people: 30, phone: '+47 469 15 283', series: true },
+  { id: 16, room: 'a3', s: 14, e: 20, who: 'Per Lie', purpose: 'Matlaging til seniortreff', people: 6, phone: '+47 905 11 642' },
+  { id: 17, room: 'a4', s: 0, e: 3, who: 'Tor Eide', purpose: 'Intervju', people: 4, phone: '+47 905 63 870' },
+  { id: 18, room: 'a4', s: 18, e: 22, who: 'Nina Berg', purpose: 'Diakoniutvalget', people: 6, phone: '+47 481 22 590' },
+  { id: 19, room: 'a5', s: 18, e: 20, who: 'Lise Aune', purpose: 'Planlegging søndagsskole', people: 5, phone: '+47 993 47 618' },
+  { id: 20, room: 'a6', s: 10, e: 14, who: 'Markus Dahl', purpose: 'Lydsjekk før konsert', people: 2, phone: '+47 977 20 118' }
+];
+function T(i) { var m = 480 + i * 30; var h = Math.floor(m / 60); return (h < 10 ? '0' : '') + h + ':' + (m % 60 ? '30' : '00'); }
+function P(i) { return (i / 28 * 100) + '%'; }
+function RN(id) { return ROOMS.filter(function (r) { return r.id === id; })[0].name; }
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { bk: BK, cur: null, dlg: null, drag: null, over: null, mv: null, toast: null }; }
+  renderVals() {
+    var self = this, st = this.state;
+    var hours = []; for (var h = 8; h < 22; h++) hours.push((h < 10 ? '0' : '') + h + ':00');
+    function slotFrom(e) { var r = e.currentTarget.getBoundingClientRect(); return Math.max(0, Math.min(27, Math.round((e.clientX - r.left) / r.width * 28 - (st.drag ? (st.drag.e - st.drag.s) / 2 : 0)))); }
+    var rows = ROOMS.map(function (room, ri) {
+      var closed = [];
+      if (room.open[0] > 0) closed.push({ l: '0%', w: P(room.open[0]), t: 'Stengt' });
+      if (room.open[1] < 28) closed.push({ l: P(room.open[1]), w: P(28 - room.open[1]), t: 'Stengt' });
+      if (room.block) closed.push({ l: P(room.block[0]), w: P(room.block[1] - room.block[0]), t: 'Stengt · ' + room.block[2] });
+      var blocks = st.bk.filter(function (b) { return b.room === room.id; }).map(function (b) {
+        return { who: b.who, purpose: b.purpose, time: T(b.s) + '–' + T(b.e), l: P(b.s), w: P(b.e - b.s), konf: !!b.konf, cls: b.konf ? 'blk-konf' : 'blk-ok', tIcon: b.konf ? 'business_center' : TYN[TYPEBY[b.id] || 'annet'][1],
+          aria: (b.konf ? 'Konferanse: ' : TYN[TYPEBY[b.id] || 'annet'][0] + ': ') + b.who + ', ' + room.name + ', ' + T(b.s) + '–' + T(b.e) + ', ' + b.purpose + ', ' + b.people + ' personer',
+          dragStyle: st.drag && st.drag.id === b.id ? 'opacity: .4' : '',
+          dragStart: function (e) { try { e.dataTransfer.setData('text/plain', String(b.id)); e.dataTransfer.effectAllowed = 'move'; } catch (x) {} self.setState({ drag: b }); },
+          dragEnd: function () { self.setState({ drag: null, over: null }); },
+          open: function () { self.setState({ cur: b, dlg: 'detail' }); } };
+      });
+      var ov = st.over && st.over.room === room.id && st.drag;
+      var len = st.drag ? st.drag.e - st.drag.s : 0;
+      var prev = ROOMS[ri - 1];
+      return { name: room.name, cap: room.cap, fl: room.fl, restricted: !!room.restricted, closed: closed, blocks: blocks,
+        head: !prev || prev.b !== room.b, headTxt: PARTS[room.b][0], headSub: PARTS[room.b][1],
+        hasMarker: !!ov, ml: ov ? P(st.over.s) : '0%', mw: ov ? P(Math.min(len, 28 - st.over.s)) : '0%', mt: ov ? 'Ny start ' + T(st.over.s) : '',
+        dropBg: '',
+        over: function (e) { if (!st.drag) return; e.preventDefault(); var s = slotFrom(e); if (!st.over || st.over.s !== s || st.over.room !== room.id) self.setState({ over: { room: room.id, s: s } }); },
+        leave: function () {},
+        drop: function (e) { if (!st.drag) return; e.preventDefault(); var s = slotFrom(e); var d = st.drag; var ln = d.e - d.s;
+          self.setState({ cur: d, dlg: 'move', mv: { room: room.id, s: s, e: Math.min(28, s + ln) }, drag: null, over: null }); }
+      };
+    });
+    var c = st.cur || {}, mv = st.mv || (st.cur ? { room: c.room, s: c.s, e: c.e } : null);
+    return {
+      escClose: function (e) { if (e.key === 'Escape') self.setState({ dlg: null, mv: null }); },
+      themeCls: this.props.dark ? 'dark' : '', hours: hours, rows: rows,
+      cur: st.cur ? { who: c.who, room: RN(c.room), time: T(c.s) + '–' + T(c.e), purpose: c.purpose, people: c.people, phone: c.phone, series: !!c.series, type: c.konf ? 'Konferanse' : TYN[TYPEBY[c.id] || 'annet'][0], typeIcon: c.konf ? 'business_center' : TYN[TYPEBY[c.id] || 'annet'][1], typeCls: c.konf ? 'tt-konf' : 'tt-' + (TYPEBY[c.id] || 'annet') } : {},
+      mv: mv ? { room: RN(mv.room), time: T(mv.s) + '–' + T(mv.e), from: T(mv.s), to: T(mv.e) } : {},
+      dlgDetail: st.dlg === 'detail', dlgMove: st.dlg === 'move', dlgCancel: st.dlg === 'cancel',
+      close: function () { self.setState({ dlg: null, mv: null }); },
+      openMove: function () { self.setState({ dlg: 'move', mv: null }); }, openCancel: function () { self.setState({ dlg: 'cancel' }); },
+      doMove: function () { var m = mv; self.setState({ bk: st.bk.map(function (b) { return b.id === c.id ? Object.assign({}, b, { room: m.room, s: m.s, e: m.e }) : b; }), dlg: null, mv: null, toast: { title: 'Bookingen er flyttet', text: 'SMS med begrunnelse er sendt til ' + c.who + '.' } }); },
+      doCancel: function () { self.setState({ bk: st.bk.filter(function (b) { return b.id !== c.id; }), dlg: null, toast: { title: 'Bookingen er avbestilt', text: 'SMS med begrunnelse er sendt til ' + c.who + '.' } }); },
+      hasToast: !!st.toast, toast: st.toast || {}, closeToast: function () { self.setState({ toast: null }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
