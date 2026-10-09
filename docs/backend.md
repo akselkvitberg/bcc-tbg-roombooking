@@ -15,7 +15,8 @@ på uten å endre skjermene.
 - **Personvern håndheves på serveren.** Medlemmer skal aldri få navn eller formål på andres bookinger (spec §3.3), og
   begrensede rom skal være skjult (§9.2). Egne DTO-er per rolle gjør det vanskelig å lekke data ved et uhell.
 - **Innlogging er bare tokenvalidering.** Kirkens innlogging brukes via OIDC; vi lagrer ingen passord.
-- **Bakgrunnsjobber** (utløpte forslag, samlet SMS) klares med det som følger med .NET, uten ekstra infrastruktur.
+- **Bakgrunnsjobber** (utløpte forslag, samlet SMS) er idempotente endepunkter som hostingens planlegger kaller, så
+  appen kan skalere til null.
 - Lav trafikk (ett senter), så én liten tjeneste og én database holder lenge.
 
 **Vurdert, ikke valgt:** TypeScript-backend (Hono/Fastify + Drizzle), som kunne importert `availability.ts`
@@ -81,9 +82,15 @@ Frontend blir liggende i roten (`src/`, `package.json`) som i `CLAUDE.md`.
 
 ### Bakgrunnsjobber og SMS
 
-- `BackgroundService` (eller Hangfire på Postgres ved behov) for:
+- Jobbene startes **utenfra** av hostingens planlegger (cron), ikke av en `BackgroundService` i appen. Da kan appen
+  skalere til null mellom forespørsler (se `hosting.md`). Jobbene:
   - forslag som utløper ved fristen (spec §6.1),
   - samling av beslutninger i serier og hele bygg til én SMS (spec §8.1, §10).
+- Hver jobb er et beskyttet internt endepunkt (`POST /internal/jobs/{navn}`, krever hemmelig nøkkel eller plattformens
+  identitet) eller en kommando i samme image (`--job {navn}`). Jobbene er idempotente og trygge å kjøre for ofte, for
+  sent eller to ganger samtidig (lås i Postgres, f.eks. `pg_try_advisory_lock`).
+- Korrekthet avhenger ikke av at jobben har kjørt: et forslag med passert frist regnes som utløpt ved lesing. Jobben
+  rydder status og sender SMS.
 - SMS sendes via `ISmsSender`. Leverandør er åpent (spec §14 spm. 1); til da logger en implementasjon meldingen i
   SMS-loggen uten å sende.
 
@@ -95,9 +102,8 @@ Frontend blir liggende i roten (`src/`, `package.json`) som i `CLAUDE.md`.
 ## Drift
 
 - Ett Docker-image, bygget i flere steg: `npm run build` → `dotnet publish`, med `dist/` servert som statiske filer.
-- PostgreSQL ved siden av. Aktuelt (full sammenligning i `hosting.md`):
-  - **Hetzner Cloud-VPS** (ca. €4–5/mnd) med app og Postgres i Docker Compose, og nattlig `pg_dump` til ekstern lagring.
-  - **Render + Neon** for å starte gratis (kald start etter inaktivitet).
+- PostgreSQL ved siden av. Alternativer og kostnad i `hosting.md`; foreløpig anbefaling er Azure Container Apps i
+  Norway East hvis BCC har Azure, ellers Cloud Run + Neon. Begge skalerer til null med jobbene som planlagte kall.
 - Migreringer kjøres ved utrulling (`dotnet ef migrations bundle`), ikke automatisk ved oppstart.
 
 ## Åpne punkter som påvirker backend
