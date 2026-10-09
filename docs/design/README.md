@@ -32,7 +32,7 @@ https://claude.ai/code/artifact/0541851b-c759-4125-9d19-1fd924cbf70d (privat –
 - **Testdata:** `ROOMS` i `Main.dc.html` / `Mobil.dc.html` (14 rom med bygg, etasje, kapasitet, åpningstider og
   bookinger for i dag). `itemsAt()` lager plausible data for andre datoer.
 - **Logikk:** `stAt`, `analyse`, `addD`, `wdOf` og utregningen av `occ` (datoer i serie). Dette er portert og testet
-  i `../../reference/availability.ts` – bruk den versjonen.
+  i `../../src/domain/availability.ts` – bruk den versjonen.
 - **Tekster:** alle norske tekster i markupen kan flyttes til `nb.json`.
 
 ## Kjente forenklinger i prototypen

@@ -16,13 +16,25 @@ export type SlotStatus = 'free' | 'req' | 'myreq' | 'busy' | 'mine' | 'closed'
 export const STATUS_PRIORITY: Record<SlotStatus, number> = { free: 1, req: 2, myreq: 3, busy: 4, mine: 5, closed: 6 }
 
 export const STATUS_LABEL_NB: Record<SlotStatus, string> = {
-  free: 'Ledig', busy: 'Opptatt', req: 'Forespurt', closed: 'Stengt', mine: 'Din booking', myreq: 'Venter på svar',
+  free: 'Ledig',
+  busy: 'Opptatt',
+  req: 'Forespurt',
+  closed: 'Stengt',
+  mine: 'Din booking',
+  myreq: 'Venter på svar',
 }
 
 /** En opptatt/forespurt/stengt periode i et rom, allerede oversatt til brukerens perspektiv. */
-export interface SlotItem { start: number; end: number; status: Exclude<SlotStatus, 'free'> }
+export interface SlotItem {
+  start: number
+  end: number
+  status: Exclude<SlotStatus, 'free'>
+}
 
-export interface RoomHours { open: number; close: number } // halvtimesindeks, f.eks. { open: 0, close: 28 }
+export interface RoomHours {
+  open: number
+  close: number
+} // halvtimesindeks, f.eks. { open: 0, close: 28 }
 
 export function slotToTime(i: number): string {
   const m = DAY_START_MINUTES + i * 30
@@ -38,7 +50,8 @@ export function timeToSlot(hhmm: string): number {
 export function slotStatus(hours: RoomHours, items: SlotItem[], i: number): SlotStatus {
   if (i < hours.open || i >= hours.close) return 'closed'
   let best: SlotStatus = 'free'
-  for (const it of items) if (i >= it.start && i < it.end && STATUS_PRIORITY[it.status] > STATUS_PRIORITY[best]) best = it.status
+  for (const it of items)
+    if (i >= it.start && i < it.end && STATUS_PRIORITY[it.status] > STATUS_PRIORITY[best]) best = it.status
   return best
 }
 
@@ -65,13 +78,21 @@ export interface WindowAnalysis {
 /** Analyser et tidsrom [start, end) i en dags statuser. */
 export function analyseWindow(day: SlotStatus[], start: number, end: number): WindowAnalysis {
   const slots = day.slice(start, end)
-  let best = 0, bestAt = 0, run = 0, runAt = 0, firstFree = -1, firstBlocked = -1
+  let best = 0,
+    bestAt = 0,
+    run = 0,
+    runAt = 0,
+    firstFree = -1,
+    firstBlocked = -1
   slots.forEach((s, k) => {
     if (s === 'free') {
       if (firstFree < 0) firstFree = k
       if (!run) runAt = k
       run++
-      if (run > best) { best = run; bestAt = runAt }
+      if (run > best) {
+        best = run
+        bestAt = runAt
+      }
     } else {
       run = 0
       if (firstBlocked < 0) firstBlocked = k
@@ -80,9 +101,9 @@ export function analyseWindow(day: SlotStatus[], start: number, end: number): Wi
   return {
     slots,
     allFree: firstBlocked < 0,
-    hasOwn: slots.some(s => s === 'mine' || s === 'myreq'),
-    anyClosed: slots.some(s => s === 'closed'),
-    allClosed: slots.length > 0 && slots.every(s => s === 'closed'),
+    hasOwn: slots.some((s) => s === 'mine' || s === 'myreq'),
+    anyClosed: slots.some((s) => s === 'closed'),
+    allClosed: slots.length > 0 && slots.every((s) => s === 'closed'),
     bestStart: start + bestAt,
     bestLength: best,
     firstFree: firstFree < 0 ? -1 : start + firstFree,
@@ -101,23 +122,38 @@ export type RoomAvailability =
  * Klassifiser et rom for resultatlisten (spec §4.1).
  * Delvis ledig krever minst `minPartialSlots` sammenhengende ledige halvtimer (standard 1 time).
  */
-export function classifyRoom(a: WindowAnalysis, capacity: number, people: number, minPartialSlots = 2): RoomAvailability {
+export function classifyRoom(
+  a: WindowAnalysis,
+  capacity: number,
+  people: number,
+  minPartialSlots = 2,
+): RoomAvailability {
   if (capacity < people) return { kind: 'too-small' }
   if (a.allFree) return { kind: 'free' }
   if (a.hasOwn) return { kind: 'own' }
   if (a.bestLength >= minPartialSlots) return { kind: 'partial', start: a.bestStart, end: a.bestStart + a.bestLength }
   if (a.allClosed) return { kind: 'unavailable', reason: 'closed' }
-  return a.firstFree >= 0 ? { kind: 'unavailable', reason: 'busy-until', until: a.firstFree } : { kind: 'unavailable', reason: 'busy-all' }
+  return a.firstFree >= 0
+    ? { kind: 'unavailable', reason: 'busy-until', until: a.firstFree }
+    : { kind: 'unavailable', reason: 'busy-all' }
 }
 
 export function availabilityLabelNb(r: RoomAvailability): string {
   switch (r.kind) {
-    case 'too-small': return 'For lite'
-    case 'free': return 'Ledig hele tiden'
-    case 'own': return 'Din booking'
-    case 'partial': return `Ledig ${slotToTime(r.start)}–${slotToTime(r.end)}`
+    case 'too-small':
+      return 'For lite'
+    case 'free':
+      return 'Ledig hele tiden'
+    case 'own':
+      return 'Din booking'
+    case 'partial':
+      return `Ledig ${slotToTime(r.start)}–${slotToTime(r.end)}`
     case 'unavailable':
-      return r.reason === 'closed' ? 'Stengt' : r.reason === 'busy-until' ? `Opptatt til ${slotToTime(r.until!)}` : 'Opptatt hele tiden'
+      return r.reason === 'closed'
+        ? 'Stengt'
+        : r.reason === 'busy-until'
+          ? `Opptatt til ${slotToTime(r.until!)}`
+          : 'Opptatt hele tiden'
   }
 }
 
@@ -127,7 +163,11 @@ export function availabilityLabelNb(r: RoomAvailability): string {
  */
 export function defaultEndForClick(day: SlotStatus[], start: number, hours: RoomHours): number {
   let end = start >= 16 ? hours.close : Math.min(start + 4, hours.close)
-  for (let k = start + 1; k < end; k++) if (day[k] !== 'free') { end = k; break }
+  for (let k = start + 1; k < end; k++)
+    if (day[k] !== 'free') {
+      end = k
+      break
+    }
   return end
 }
 
@@ -135,13 +175,25 @@ export function defaultEndForClick(day: SlotStatus[], start: number, hours: Room
 
 export type RepeatPattern = 'none' | 'weekly' | 'biweekly' | 'monthly'
 
-function parse(iso: string): Date { const [y, m, d] = iso.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)) }
-function fmt(d: Date): string { return d.toISOString().slice(0, 10) }
+function parse(iso: string): Date {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(Date.UTC(y, m - 1, d))
+}
+function fmt(d: Date): string {
+  return d.toISOString().slice(0, 10)
+}
 
-export function addDays(iso: string, n: number): string { const d = parse(iso); d.setUTCDate(d.getUTCDate() + n); return fmt(d) }
+export function addDays(iso: string, n: number): string {
+  const d = parse(iso)
+  d.setUTCDate(d.getUTCDate() + n)
+  return fmt(d)
+}
 
 /** 1 = mandag … 7 = søndag. */
-export function isoWeekday(iso: string): number { const w = parse(iso).getUTCDay(); return w === 0 ? 7 : w }
+export function isoWeekday(iso: string): number {
+  const w = parse(iso).getUTCDay()
+  return w === 0 ? 7 : w
+}
 
 /** ISO 8601-ukenummer. */
 export function isoWeek(iso: string): number {
@@ -157,14 +209,19 @@ export const MAX_OCCURRENCES = 26
  * Datoene i en serie (spec §4.3). Månedlig = samme dato; måneder uten den datoen hoppes over.
  * Begrenses til `MAX_OCCURRENCES` og ett år frem fra første dato.
  */
-export function occurrences(firstDate: string, pattern: RepeatPattern, end: { count: number } | { until: string }): string[] {
+export function occurrences(
+  firstDate: string,
+  pattern: RepeatPattern,
+  end: { count: number } | { until: string },
+): string[] {
   if (pattern === 'none') return [firstDate]
   const limit = addDays(firstDate, 365)
   const until = 'until' in end ? (end.until < limit ? end.until : limit) : limit
   const max = Math.min('count' in end ? end.count : MAX_OCCURRENCES, MAX_OCCURRENCES)
   const out: string[] = []
   if (pattern === 'monthly') {
-    const f = parse(firstDate), day = f.getUTCDate()
+    const f = parse(firstDate),
+      day = f.getUTCDate()
     for (let k = 0; out.length < max && k < 13; k++) {
       const d = new Date(Date.UTC(f.getUTCFullYear(), f.getUTCMonth() + k, day))
       if (d.getUTCDate() !== day) continue // måneden mangler datoen
@@ -204,13 +261,22 @@ export function evaluateOccurrences(
   end: number,
   skipped: ReadonlySet<string> = new Set(),
 ): OccurrenceResult[] {
-  return dates.map(date => {
+  return dates.map((date) => {
     let status: OccurrenceStatus = 'free'
     let roomId: string | undefined, from: number | undefined
     for (const id of roomIds) {
       const a = analyseWindow(slotsFor(id, date), start, end)
-      if (a.anyClosed) { status = 'closed'; roomId = id; from = undefined; break }
-      if (!a.allFree && status === 'free') { status = 'conflict'; roomId = id; from = a.firstBlocked }
+      if (a.anyClosed) {
+        status = 'closed'
+        roomId = id
+        from = undefined
+        break
+      }
+      if (!a.allFree && status === 'free') {
+        status = 'conflict'
+        roomId = id
+        from = a.firstBlocked
+      }
     }
     const isSkipped = skipped.has(date)
     return { date, status, skipped: isSkipped, included: !isSkipped && status !== 'closed', roomId, from }
@@ -223,13 +289,17 @@ export type Outcome =
   | { kind: 'needs-approval'; reasons: Array<'manual-room' | 'whole-part' | 'conflict'>; conflicts: number }
 
 /** Hva skjer når brukeren sender (spec §4.3, §4.5). */
-export function bookingOutcome(opts: { rooms: Array<{ approval: 'automatic' | 'manual' }>; wholePart: boolean; occurrences: OccurrenceResult[] }): Outcome {
-  const included = opts.occurrences.filter(o => o.included)
+export function bookingOutcome(opts: {
+  rooms: Array<{ approval: 'automatic' | 'manual' }>
+  wholePart: boolean
+  occurrences: OccurrenceResult[]
+}): Outcome {
+  const included = opts.occurrences.filter((o) => o.included)
   if (included.length === 0 || opts.rooms.length === 0) return { kind: 'nothing-to-send' }
-  const conflicts = included.filter(o => o.status === 'conflict').length
+  const conflicts = included.filter((o) => o.status === 'conflict').length
   const reasons: Array<'manual-room' | 'whole-part' | 'conflict'> = []
   if (opts.wholePart) reasons.push('whole-part')
-  else if (opts.rooms.some(r => r.approval === 'manual')) reasons.push('manual-room')
+  else if (opts.rooms.some((r) => r.approval === 'manual')) reasons.push('manual-room')
   if (conflicts) reasons.push('conflict')
   return reasons.length ? { kind: 'needs-approval', reasons, conflicts } : { kind: 'confirmed' }
 }

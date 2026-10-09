@@ -1,0 +1,6 @@
+/* Globale stiler. Farger kommer fra BCC-bibliotekets tokens – ingen hardkodede farger her. */
+body {
+  margin: 0;
+  background: var(--color-elevation-surface-default);
+  color: var(--color-text-default);
+}

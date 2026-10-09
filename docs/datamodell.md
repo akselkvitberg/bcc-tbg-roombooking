@@ -3,7 +3,7 @@
 Forslag i TypeScript; dette er kontrakten frontend og mock-API bygger på. Backend (ASP.NET Core + PostgreSQL, se
 `backend.md`) speiler typene, og OpenAPI fra backend blir den endelige kontrakten.
 Tidspunkt lagres som ISO 8601 i Europe/Oslo. I UI-logikken brukes halvtimesindeks 0–28 (08:00–22:00), se
-`reference/availability.ts`.
+`src/domain/availability.ts`.
 
 ```ts
 type Id = string
@@ -127,7 +127,7 @@ interface SmsLogEntry {
 
 - **Status for et rom i et tidsrom** for en gitt bruker: `free | busy | req | closed | mine | myreq`, med prioritet
   Stengt > Din booking > Opptatt > Venter på svar > Forespurt > Ledig (spec §3.3). Se `slotStatus` i
-  `reference/availability.ts`.
+  `src/domain/availability.ts`.
 - **Lengste ledige vindu** og **«Opptatt til»** for et tidsrom: `analyseWindow`.
 - **Utfall før sending** (bekreftes / går til romansvarlig / konflikt): `bookingOutcome`.
 - **Datoer i en serie** med status per dato: `occurrences`.
