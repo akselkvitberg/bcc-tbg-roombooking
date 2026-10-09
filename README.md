@@ -11,6 +11,7 @@ docs/
   plan.md                 Byggeplan i 7 faser med akseptansekriterier og ferdige forespørsler
   komponentkart.md        Prototype → BCC-komponenter + egne komponenter, type-farger
   datamodell.md           Forslag til domenemodell og API-grensesnitt (TypeScript)
+  backend.md              Backend-beslutning: ASP.NET Core + EF Core + PostgreSQL
   design/                 Prototypens kildefiler (.dc.html) + README om hvordan de leses
 reference/
   availability.ts         Ferdig logikk: status, ledig tid, «Opptatt til», gjentakelser, utfall
@@ -30,5 +31,5 @@ reference/
 - Hold én fase per pull request – da er det enkelt å se gjennom og rette.
 - Er noe uklart i spesifikasjonen, avgjør det og oppdater `docs/spec.md` i samme pull request, så den forblir fasit.
 - Prototypen på lerretet (lenke i `docs/design/README.md`) er nyttig å ha oppe ved siden av når du ser gjennom.
-- Backend er ikke valgt. Appen bygges mot et mock-API først; når backend er bestemt, byttes mocken ut uten å endre skjermene.
+- Backend er ASP.NET Core + EF Core + PostgreSQL (se `docs/backend.md`). Appen bygges mot et mock-API først; i backend-fasen kobles et HTTP-API på uten å endre skjermene.
 - Åpne spørsmål står i `docs/spec.md` §14 – noen av dem (SMS-leverandør, medlems-API) bør avklares før fase 6.

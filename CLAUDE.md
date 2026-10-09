@@ -12,6 +12,7 @@ ledere («power users») og romansvarlige/admin.
 | `docs/plan.md` | Fasene vi bygger i, med akseptansekriterier |
 | `docs/komponentkart.md` | Hvilken BCC-komponent som brukes for hva, og hvilke egne komponenter vi lager |
 | `docs/datamodell.md` | Domenemodellen (TypeScript-typer) |
+| `docs/backend.md` | Backend-beslutning: ASP.NET Core + EF Core + PostgreSQL, arkitektur og drift |
 | `docs/design/*.dc.html` | Klikkbar prototype (fasit for utseende og flyt). Se `docs/design/README.md` |
 | `reference/availability.ts` | Ferdig, testet logikk for status, ledig tid, konflikter og gjentakelser. Flytt inn i `src/domain/` og bruk den |
 
@@ -25,8 +26,10 @@ Er spesifikasjonen og prototypen uenige, gjelder spesifikasjonen. Spør heller e
   biblioteket gjør det. Dokumentasjon: https://components.bcc.no (og `llms-full.txt` der).
 - Tekst: `vue-i18n`, norsk bokmål i `src/locales/nb.json`. Ingen hardkodet brukertekst i komponenter.
 - Test: Vitest + @vue/test-utils for logikk og komponenter. Playwright for de viktigste flytene når fase 2 er ferdig.
-- Backend er **ikke bestemt**. All datatilgang går gjennom grensesnitt i `src/api/` med en in-memory mock
-  (`src/api/mock/`) basert på testdataene i prototypen. Ikke finn opp endepunkter eller backend-teknologi.
+- Backend: **ASP.NET Core (minimal API, .NET 10) + EF Core + PostgreSQL** i `server/`, se `docs/backend.md`.
+  All datatilgang i frontend går gjennom grensesnitt i `src/api/`, med en in-memory mock (`src/api/mock/`) basert på
+  testdataene i prototypen. Frontend bygges mot mocken til backend-fasen; ikke finn opp endepunkter utenom det
+  `docs/backend.md` og OpenAPI-kontrakten beskriver.
 
 ## Regler
 
@@ -49,7 +52,8 @@ Er spesifikasjonen og prototypen uenige, gjelder spesifikasjonen. Spør heller e
 ## Arbeidsmåte
 
 - Én fase (eller del av fase) per branch og pull request. Små, beskrivende commits.
-- Før du sier at noe er ferdig: `npm run lint`, `npm run typecheck`, `npm run test` skal være grønne.
+- Før du sier at noe er ferdig: `npm run lint`, `npm run typecheck`, `npm run test` skal være grønne. Endringer i
+  `server/`: også `dotnet build`, `dotnet test` og `dotnet format --verify-no-changes`.
 - Skriv tester for domenelogikk og for akseptansekriteriene i `docs/plan.md`.
 - Mappestruktur:
   ```
@@ -60,4 +64,5 @@ Er spesifikasjonen og prototypen uenige, gjelder spesifikasjonen. Spør heller e
     features/       booking-mobile/, booking-desktop/, my-bookings/, manager/, admin/
     locales/nb.json
     router/  stores/  styles/
+  server/           .NET-backend (se docs/backend.md)
   ```

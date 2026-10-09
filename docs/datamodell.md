@@ -1,6 +1,7 @@
 # Datamodell (forslag)
 
-Teknologinøytralt forslag i TypeScript. Backend er ikke valgt; dette er kontrakten frontend og mock-API bygger på.
+Forslag i TypeScript; dette er kontrakten frontend og mock-API bygger på. Backend (ASP.NET Core + PostgreSQL, se
+`backend.md`) speiler typene, og OpenAPI fra backend blir den endelige kontrakten.
 Tidspunkt lagres som ISO 8601 i Europe/Oslo. I UI-logikken brukes halvtimesindeks 0–28 (08:00–22:00), se
 `reference/availability.ts`.
 

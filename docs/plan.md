@@ -118,9 +118,28 @@ samme komponent fra ulike steg).
 
 ---
 
-## Etter fase 6
+## Fase 7 – Backend (docs/backend.md)
 
-- Koble mock-API mot ekte backend når den er valgt.
+**Mål:** Ekte API og database bak de samme grensesnittene som mocken.
+
+**Akseptanse**
+- `server/` med Api, Domain, Data og Tests som beskrevet i `docs/backend.md`; `dotnet build`, `test` og `format` er grønne.
+- PostgreSQL-skjema via EF Core-migreringer, med exclusion constraint mot overlappende bekreftede bookinger.
+- Domeneregler portert fra `src/domain/availability.ts`, med testene speilet i xUnit.
+- Rollebaserte svar: medlemmer får aldri navn/formål på andres bookinger; begrensede rom er skjult. Testet.
+- OpenAPI-typer generert til `src/api/generated/`; `src/api/http/` implementerer grensesnittene; `VITE_API=mock|http`.
+- Dev-innlogging med rollevalg; OIDC-validering bak konfigurasjon.
+- Docker-image som serverer API og `dist/`.
+
+> **Forespørsel:** Les CLAUDE.md og docs/backend.md. Bygg fase 7: .NET-løsningen i server/, skjema og migreringer,
+> domeneregler med speilede tester, rollebaserte endepunkter for det src/api/ trenger, generert TypeScript-klient og
+> HTTP-implementasjon av API-grensesnittene, og Dockerfile.
+
+---
+
+## Etter fase 7
+
+- Koble til kirkens innlogging, medlems-API og SMS-leverandør (spec §14).
 - Erstatt eksempelkartet med ekte plantegning (spec §14 spm. 8).
 - Playwright-tester for: booke en kveld på mobil, gjentakende booking med hoppede datoer på desktop, godkjenne en
   konflikt som romansvarlig.
