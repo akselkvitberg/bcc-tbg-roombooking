@@ -95,7 +95,7 @@ Frontend blir liggende i roten (`src/`, `package.json`) som i `CLAUDE.md`.
 ## Drift
 
 - Ett Docker-image, bygget i flere steg: `npm run build` → `dotnet publish`, med `dist/` servert som statiske filer.
-- PostgreSQL ved siden av. Aktuelt:
+- PostgreSQL ved siden av. Aktuelt (full sammenligning i `hosting.md`):
   - **Hetzner Cloud-VPS** (ca. €4–5/mnd) med app og Postgres i Docker Compose, og nattlig `pg_dump` til ekstern lagring.
   - **Render + Neon** for å starte gratis (kald start etter inaktivitet).
 - Migreringer kjøres ved utrulling (`dotnet ef migrations bundle`), ikke automatisk ved oppstart.
@@ -105,4 +105,4 @@ Frontend blir liggende i roten (`src/`, `package.json`) som i `CLAUDE.md`.
 - Hvilke claims innloggingen gir (medlemskap, mobilnummer) – spec §14 spm. 3.
 - Hvilke felter medlems-API-et returnerer og hvordan det søkes – spec §14 spm. 9.
 - SMS-leverandør – spec §14 spm. 1.
-- Endelig valg av hosting.
+- Endelig valg av hosting – se `hosting.md` for alternativer og kostnad.
