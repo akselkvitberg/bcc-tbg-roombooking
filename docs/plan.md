@@ -118,28 +118,33 @@ samme komponent fra ulike steg).
 
 ---
 
-## Fase 7 – Backend (docs/backend.md)
+## Fase 7 – WordPress-plugin (docs/backend.md)
 
-**Mål:** Ekte API og database bak de samme grensesnittene som mocken.
+**Mål:** Ekte API og database i en WordPress-plugin, bak de samme grensesnittene som mocken.
 
 **Akseptanse**
-- `server/` med Api, Domain, Data og Tests som beskrevet i `docs/backend.md`; `dotnet build`, `test` og `format` er grønne.
-- PostgreSQL-skjema via EF Core-migreringer, med exclusion constraint mot overlappende bekreftede bookinger.
-- Domeneregler portert fra `src/domain/availability.ts`, med testene speilet i xUnit.
+- `plugin/jarlsberg-rombooking/` med Domain, Data, Rest, Jobs og Sms som beskrevet i `docs/backend.md`;
+  `composer lint` og `composer test` er grønne.
+- `.wp-env.json` starter WordPress lokalt med pluginen aktivert, testbrukere for hver rolle og Xdebug (`--xdebug`).
+- Tabeller via `dbDelta` med skjemaversjon. Bekrefting av bookinger låser rommet i en transaksjon; en test viser at
+  to samtidige bekreftelser av samme tid gir én booking og én `409`.
+- Domeneregler portert fra `src/domain/availability.ts`, med testene speilet i PHPUnit.
 - Rollebaserte svar: medlemmer får aldri navn/formål på andres bookinger; begrensede rom er skjult. Testet.
-- OpenAPI-typer generert til `src/api/generated/`; `src/api/http/` implementerer grensesnittene; `VITE_API=mock|http`.
-- Dev-innlogging med rollevalg; OIDC-validering bak konfigurasjon.
-- Docker-image som serverer API og `dist/`.
+- `src/api/http/` implementerer grensesnittene mot `jarlsberg-rombooking/v1` med nonce; `VITE_API=mock|http`.
+- Sidemalen «Rombooking (fullskjerm)» viser appen uten temaet, med dype lenker som virker.
+- GitHub Actions bygger en installerbar zip.
 
-> **Forespørsel:** Les CLAUDE.md og docs/backend.md. Bygg fase 7: .NET-løsningen i server/, skjema og migreringer,
-> domeneregler med speilede tester, rollebaserte endepunkter for det src/api/ trenger, generert TypeScript-klient og
-> HTTP-implementasjon av API-grensesnittene, og Dockerfile.
+> **Forespørsel:** Les CLAUDE.md og docs/backend.md. Bygg fase 7: WordPress-pluginen i plugin/jarlsberg-rombooking/,
+> tabeller og skjemaversjon, domeneregler med speilede PHPUnit-tester, REST-ruter med rollebaserte svar og låsing mot
+> dobbeltbooking, HTTP-implementasjon av API-grensesnittene, sidemalen som laster Vite-bygget, wp-env-oppsett og
+> zip-bygg i GitHub Actions.
 
 ---
 
 ## Etter fase 7
 
-- Koble til kirkens innlogging, medlems-API og SMS-leverandør (spec §14).
+- Koble medlemskap og mobilnummer fra nettstedets innlogging, medlems-API og SMS-leverandør (spec §14).
+- Installer pluginen på nettstedet og sett opp ekte cron hos vertskapet.
 - Erstatt eksempelkartet med ekte plantegning (spec §14 spm. 8).
 - Playwright-tester for: booke en kveld på mobil, gjentakende booking med hoppede datoer på desktop, godkjenne en
   konflikt som romansvarlig.

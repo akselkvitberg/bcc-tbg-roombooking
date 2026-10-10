@@ -1,108 +1,156 @@
 # Backend – beslutning
 
-Besluttet 2026-10-09.
+Besluttet 2026-10-10. Erstatter beslutningen fra 2026-10-09 (ASP.NET Core + EF Core + PostgreSQL).
 
 ## Beslutning
 
-**ASP.NET Core (minimal API, .NET 10) + EF Core (Npgsql) + PostgreSQL.** Én tjeneste som både har API-et og
-serverer den bygde Vue-appen (`dist/`). Frontend bygges fortsatt mot mock-API først (se `plan.md`); backend kobles
-på uten å endre skjermene.
+**WordPress-plugin (PHP 8.1+) på kirkens eksisterende WordPress-nettsted.** Pluginen har REST-API-et, lagrer data i
+egne tabeller i WordPress-databasen (MySQL/MariaDB) og serverer den bygde Vue-appen på en egen side. Frontend bygges
+fortsatt mot mock-API først (se `plan.md`); backend kobles på uten å endre skjermene.
 
 ## Hvorfor
 
-- **Dobbeltbooking stoppes i databasen.** PostgreSQL kan nekte overlappende bekreftede bookinger i samme rom med en
-  exclusion constraint, også når to forespørsler kommer samtidig.
-- **Personvern håndheves på serveren.** Medlemmer skal aldri få navn eller formål på andres bookinger (spec §3.3), og
-  begrensede rom skal være skjult (§9.2). Egne DTO-er per rolle gjør det vanskelig å lekke data ved et uhell.
-- **Innlogging er bare tokenvalidering.** Kirkens innlogging brukes via OIDC; vi lagrer ingen passord.
-- **Bakgrunnsjobber** (utløpte forslag, samlet SMS) klares med det som følger med .NET, uten ekstra infrastruktur.
-- Lav trafikk (ett senter), så én liten tjeneste og én database holder lenge.
+- **Ingen ekstra hosting.** Nettstedet finnes og driftes allerede. En egen tjeneste med database ville kostet penger
+  og drift hver måned for ett senter med lav trafikk.
+- **Innlogging finnes.** Brukerne logger allerede inn på nettstedet med kirkens innlogging; pluginen bruker
+  WordPress-brukeren og trenger ingen egen tokenvalidering.
+- **Pluginen har vært i bruk før.** Funksjonene i spesifikasjonen er prøvd ut i den forrige pluginen (fase 0–9).
+- **Lokal feilsøking løses med `@wordpress/env`** (Docker) med Xdebug, i stedet for en manuell WordPress-installasjon
+  på Windows. Det var grunnen til at vi gikk bort fra WordPress sist.
 
-**Vurdert, ikke valgt:** TypeScript-backend (Hono/Fastify + Drizzle), som kunne importert `availability.ts`
-direkte. Logikken som må dupliseres er liten, og den avgjørende overlappsjekken ligger uansett i databasen.
+**Vurdert, ikke valgt:** ASP.NET Core + PostgreSQL (forrige beslutning). Bedre overlappsjekk i databasen
+(exclusion constraint) og sterkere typer, men krever egen hosting (ca. €4–5/mnd eller en gratis tjeneste med kald
+start) og egen drift.
+
+**Hva vi gir fra oss:** MySQL har ingen exclusion constraint, så dobbeltbooking må stoppes med låsing i PHP (se
+under). Domenereglene må finnes både i TypeScript (frontend) og PHP (server).
 
 ## Arkitektur
 
 ### Mappestruktur
 
 ```
-server/
-  Jarlsberg.Rombooking.Api/        endepunkter, autentisering, DTO-er per rolle, bakgrunnsjobber
-  Jarlsberg.Rombooking.Domain/     regler: status, overlapp, utfall, gjentakelser (ingen EF/ASP.NET)
-  Jarlsberg.Rombooking.Data/       EF Core DbContext, konfigurasjon, migreringer
-  Jarlsberg.Rombooking.Tests/      xUnit: domenetester + integrasjonstester mot Postgres
+plugin/jarlsberg-rombooking/
+  jarlsberg-rombooking.php      plugin-header, oppstart, aktivering/deaktivering
+  src/
+    Domain/                     regler: status, overlapp, utfall, gjentakelser (ren PHP, ingen WordPress-kall)
+    Data/                       tabeller, migreringer (dbDelta), repositorier mot $wpdb
+    Rest/                       REST-ruter, tilgangssjekk, svar formet per rolle
+    Jobs/                       WP-Cron-jobber (utløpte forslag, samlet SMS)
+    Sms/                        SmsSender-grensesnitt + logg-implementasjon
+    Admin/                      sideoppsett, innstillinger i wp-admin
+  templates/app.php             sidemal som bare viser appen (uten temaets topp og bunn)
+  assets/app/                   Vite-bygget (genereres, sjekkes ikke inn)
+  tests/                        PHPUnit
+  composer.json  phpcs.xml
+.wp-env.json                    lokal WordPress i Docker
 ```
 
-Frontend blir liggende i roten (`src/`, `package.json`) som i `CLAUDE.md`.
+Frontend blir liggende i roten (`src/`, `package.json`) som i `CLAUDE.md`. `npm run build` legger bygget i
+`plugin/jarlsberg-rombooking/assets/app/`.
+
+### Hvordan appen vises
+
+- Pluginen registrerer en sidemal, «Rombooking (fullskjerm)», som bare skriver ut `<div id="app">` og Vue-appen, uten
+  temaets topp, bunn eller CSS. Slik er BCC-komponentene, mobiloppsettet og lys/mørk modus uavhengige av temaet.
+- Admin velger hvilken side som er appen i innstillingene. Vue-ruteren bruker `createWebHistory` med sidens sti som
+  base; pluginen legger inn en rewrite-regel så dype lenker (`/rombooking/mine`) treffer samme side.
+- PHP leser Vites `manifest.json` og laster riktige filer med `wp_enqueue_script_module` / `wp_enqueue_style`.
+- Oppstartsdata (REST-adresse, nonce, innlogget bruker og roller) legges inn med `wp_add_inline_script`, så appen
+  slipper et ekstra kall ved oppstart.
 
 ### Data
 
-- Tabellene følger `datamodell.md`. Id-er er `uuid`.
-- Tidspunkt lagres som `timestamptz`. Omregning til Europe/Oslo skjer i kanten (API og UI), med NodaTime for
-  sommertid og ISO-uker.
-- Ingen overlapp mellom bekreftede bookinger i samme rom:
-  ```sql
-  CREATE EXTENSION IF NOT EXISTS btree_gist;
-  ALTER TABLE booking ADD CONSTRAINT booking_no_overlap
-    EXCLUDE USING gist (room_id WITH =, tstzrange(start_at, end_at) WITH &&)
-    WHERE (status = 'confirmed');
-  ```
-  Ventende forespørsler kan overlappe – de blir konflikter for romansvarlig (spec §8.1). Brudd på regelen gir
-  `409 Conflict`.
-- Rom slettes aldri (spec §9.1), bare `active = false`.
-- Skjemaendringer gjøres med EF Core-migreringer.
+- Egne tabeller med WordPress-prefiks (`{prefix}rb_room`, `rb_booking`, `rb_booking_group`, `rb_series`,
+  `rb_proposal`, `rb_decision`, `rb_template`, `rb_closure`, `rb_room_access`, `rb_booking_type`, `rb_sms_log`).
+  Tabellene følger `datamodell.md`. Ikke custom post types: overlappspørringer og indekser trenger egne kolonner.
+- Medlemmer er WordPress-brukere; `memberId` er `user_id`.
+- Id-er er `BIGINT UNSIGNED AUTO_INCREMENT`; API-et sender dem som strenger, så `Id = string` i frontend gjelder fortsatt.
+- Tidspunkt lagres som `DATETIME` i UTC. Omregning til Europe/Oslo skjer i kanten (API og UI) med
+  `DateTimeImmutable` og `DateTimeZone('Europe/Oslo')`, uavhengig av nettstedets tidssoneinnstilling.
+- Krever InnoDB (MySQL 8 / MariaDB 10.6+) for transaksjoner og radlås.
+- Skjema opprettes og oppgraderes med `dbDelta` ved aktivering og når pluginens skjemaversjon (lagret i `wp_options`)
+  er lavere enn kodens.
+- Rom slettes aldri (spec §9.1), bare `active = 0`.
+
+### Ingen dobbeltbooking
+
+MySQL kan ikke nekte overlappende rader med en constraint. I stedet går all bekrefting av bookinger (ny booking med
+automatisk godkjenning, godkjenning, flytt, godta forslag) gjennom én funksjon som:
+
+1. starter en transaksjon,
+2. låser rommets rad med `SELECT … FROM rb_room WHERE id IN (…) ORDER BY id FOR UPDATE` (fast rekkefølge, så to
+   forespørsler ikke låser hverandre fast),
+3. sjekker overlapp mot bekreftede bookinger i rommet (`start_at < :end AND end_at > :start`),
+4. skriver og committer, eller ruller tilbake og svarer `409 Conflict`.
+
+Indeks på `(room_id, status, start_at, end_at)`. Ventende forespørsler kan overlappe – de blir konflikter for
+romansvarlig (spec §8.1). Integrasjonstester kjører to samtidige bekreftelser og sjekker at bare én går gjennom.
 
 ### API
 
-- REST/JSON med minimal API. **OpenAPI** genereres fra koden og er kontrakten.
-- Frontend genererer typer fra OpenAPI med `openapi-typescript` til `src/api/generated/`. En HTTP-implementasjon i
-  `src/api/http/` implementerer de samme grensesnittene som mocken. Valg med `VITE_API=mock|http`.
-- Svar formes etter rolle:
+- WordPress REST API, navnerom `jarlsberg-rombooking/v1`, registrert med `register_rest_route`.
+- Hver rute har `permission_callback` som sjekker innlogging, medlemskap og rolle. Ingen rute er åpen for ikke-innloggede.
+- Autentisering med WordPress-informasjonskapselen + `X-WP-Nonce` (nonce fra oppstartsdataene).
+- Kontrakten er TypeScript-grensesnittene i `src/api/` (se `datamodell.md`). Hver rute har et JSON-schema i `args`
+  for validering. En HTTP-implementasjon i `src/api/http/` implementerer de samme grensesnittene som mocken. Valg med
+  `VITE_API=mock|http`.
+- Svar formes etter rolle i egne funksjoner per rolle:
   - Medlem: status per rom og tidsrom, «Opptatt til», egne bookinger. Aldri navn, formål eller antall på andres.
   - Romansvarlig/admin: i tillegg navn, formål, antall og kontaktperson.
   - Begrensede rom filtreres bort i spørringen for alle uten tilgang (romansvarlig ser alltid alt).
-- Feil returneres som `ProblemDetails`. Valideringsfeil har feltnavn, så skjemaene kan vise dem ved feltet.
+- Feil returneres som `WP_Error` med HTTP-status. Valideringsfeil har feltnavn i `data.params`, så skjemaene kan vise
+  dem ved feltet.
 
 ### Innlogging og roller
 
-- Kirkens innlogging via OIDC; API-et validerer JWT (`AddJwtBearer`).
-- Medlemskap og mobilnummer leses fra claims der de finnes (spec §11). Hvilke claims er åpent spørsmål (spec §14
-  spm. 3).
-- Roller (konferanse, romansvarlig, admin) lagres i vår database og gis av admin (spec §2).
-- Lokal utvikling: en dev-innlogging med rollevalg, tilsvarende mock-innloggingen i fase 1. Kun aktiv i Development.
+- Innlogging er nettstedets eksisterende innlogging (kirkens innlogging via plugin på nettstedet). Pluginen bruker
+  `is_user_logged_in()` og `wp_get_current_user()`.
+- Medlemskap og mobilnummer leses fra brukerdata som innloggingen legger inn. Hvor det ligger er åpent spørsmål
+  (spec §14 spm. 3); pluginen leser det gjennom filtrene `jarlsberg_rombooking_is_member` og
+  `jarlsberg_rombooking_member_phone`, så det kan kobles til uten å endre koden. Mobilnummer som brukeren oppgir selv
+  lagres i user meta.
+- Roller er egne capabilities på WordPress-brukeren: `rb_conference`, `rb_manage_bookings`, `rb_admin`. De gis av
+  admin i pluginens admin-skjerm (spec §2). WordPress-administratorer har alle.
+- Lokal utvikling: `wp-env` med testbrukere for hver rolle (medlem, konferanse, romansvarlig, admin, ikke medlem),
+  opprettet av et oppsettskript.
 
 ### Domenelogikk
 
-- `Jarlsberg.Rombooking.Domain` porterer reglene serveren må avgjøre fra `reference/availability.ts`: status med
-  prioritet, overlapp/konflikt, utfall (bekreftes / går til romansvarlig), datoer i serie (maks 26, ett år frem,
-  måneder uten datoen hoppes over).
-- Testene i `availability.test.ts` speiles som xUnit-tester, så frontend og backend er enige.
+- `src/Domain/` porterer reglene serveren må avgjøre fra `src/domain/availability.ts`: status med prioritet,
+  overlapp/konflikt, utfall (bekreftes / går til romansvarlig), datoer i serie (maks 26, ett år frem, måneder uten
+  datoen hoppes over).
+- Testene i `availability.test.ts` speiles som PHPUnit-tester, så frontend og backend er enige.
 - Frontend beholder `src/domain/availability.ts` for umiddelbar tilbakemelding. Serveren har siste ord.
 
 ### Bakgrunnsjobber og SMS
 
-- `BackgroundService` (eller Hangfire på Postgres ved behov) for:
+- WP-Cron for:
   - forslag som utløper ved fristen (spec §6.1),
   - samling av beslutninger i serier og hele bygg til én SMS (spec §8.1, §10).
-- SMS sendes via `ISmsSender`. Leverandør er åpent (spec §14 spm. 1); til da logger en implementasjon meldingen i
+- WP-Cron kjører bare når noen besøker nettstedet. På produksjon settes `DISABLE_WP_CRON` og en ekte cron som kaller
+  `wp-cron.php` hvert 5. minutt, hvis vertskapet tillater det. Jobbene må tåle å kjøre sent og to ganger.
+- SMS sendes via `SmsSender`. Leverandør er åpent (spec §14 spm. 1); til da logger en implementasjon meldingen i
   SMS-loggen uten å sende.
 
 ### Kvalitet
 
-- `dotnet build`, `dotnet test` og `dotnet format --verify-no-changes` skal være grønne.
-- Integrasjonstester kjører mot ekte Postgres (Testcontainers), så exclusion constraint og spørringer testes på ordentlig.
+- `composer test` (PHPUnit) og `composer lint` (PHPCS med WordPress Coding Standards) skal være grønne.
+- Domenetester kjører uten WordPress. Integrasjonstester kjører i `wp-env` mot ekte MySQL, så låsing, spørringer og
+  rollebaserte svar testes på ordentlig.
+- Lokal feilsøking: `npx wp-env start --xdebug`, og VS Code-utvidelsen «PHP Debug» kobles til.
 
 ## Drift
 
-- Ett Docker-image, bygget i flere steg: `npm run build` → `dotnet publish`, med `dist/` servert som statiske filer.
-- PostgreSQL ved siden av. Aktuelt:
-  - **Hetzner Cloud-VPS** (ca. €4–5/mnd) med app og Postgres i Docker Compose, og nattlig `pg_dump` til ekstern lagring.
-  - **Render + Neon** for å starte gratis (kald start etter inaktivitet).
-- Migreringer kjøres ved utrulling (`dotnet ef migrations bundle`), ikke automatisk ved oppstart.
+- Pluginen leveres som zip (`plugin/jarlsberg-rombooking` med ferdig bygget `assets/app/`, uten tester og
+  utviklingsfiler), laget av en GitHub Actions-jobb, og installeres via wp-admin.
+- Skjemaendringer kjøres automatisk ved første forespørsel etter oppdatering (skjemaversjon i `wp_options`).
+- Backup følger nettstedets eksisterende database-backup. Sjekk at den tar med `rb_`-tabellene.
+- Krav til vertskapet: PHP 8.1+, MySQL 8 / MariaDB 10.6+ med InnoDB, helst ekte cron.
 
 ## Åpne punkter som påvirker backend
 
-- Hvilke claims innloggingen gir (medlemskap, mobilnummer) – spec §14 spm. 3.
+- Hvilken innloggingsplugin nettstedet bruker, og hvor medlemskap og mobilnummer ligger på brukeren – spec §14 spm. 3.
 - Hvilke felter medlems-API-et returnerer og hvordan det søkes – spec §14 spm. 9.
 - SMS-leverandør – spec §14 spm. 1.
-- Endelig valg av hosting.
+- PHP- og MySQL-versjon og om ekte cron er tilgjengelig hos nettstedets vertskap.

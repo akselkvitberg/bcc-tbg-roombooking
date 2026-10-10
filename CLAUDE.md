@@ -1,6 +1,6 @@
 # Jarlsberg rombooking – instruksjoner for Claude Code
 
-Webapp der medlemmer booker rom på Jarlsberg (konferansesenter, to bygg: Nybygget og AK-bygget, to etasjer hver),
+WordPress-plugin der medlemmer booker rom på Jarlsberg (konferansesenter, to bygg: Nybygget og AK-bygget, to etasjer hver),
 og romansvarlige godkjenner, flytter og avbestiller. Mobil er hovedflaten for vanlige medlemmer; desktop er for
 ledere («power users») og romansvarlige/admin.
 
@@ -12,7 +12,7 @@ ledere («power users») og romansvarlige/admin.
 | `docs/plan.md` | Fasene vi bygger i, med akseptansekriterier |
 | `docs/komponentkart.md` | Hvilken BCC-komponent som brukes for hva, og hvilke egne komponenter vi lager |
 | `docs/datamodell.md` | Domenemodellen (TypeScript-typer) |
-| `docs/backend.md` | Backend-beslutning: ASP.NET Core + EF Core + PostgreSQL, arkitektur og drift |
+| `docs/backend.md` | Backend-beslutning: WordPress-plugin (PHP, REST API, egne tabeller i MySQL), arkitektur og drift |
 | `docs/design/*.dc.html` | Klikkbar prototype (fasit for utseende og flyt). Se `docs/design/README.md` |
 | `reference/availability.ts` | Ferdig, testet logikk for status, ledig tid, konflikter og gjentakelser. Flytt inn i `src/domain/` og bruk den |
 
@@ -26,10 +26,11 @@ Er spesifikasjonen og prototypen uenige, gjelder spesifikasjonen. Spør heller e
   biblioteket gjør det. Dokumentasjon: https://components.bcc.no (og `llms-full.txt` der).
 - Tekst: `vue-i18n`, norsk bokmål i `src/locales/nb.json`. Ingen hardkodet brukertekst i komponenter.
 - Test: Vitest + @vue/test-utils for logikk og komponenter. Playwright for de viktigste flytene når fase 2 er ferdig.
-- Backend: **ASP.NET Core (minimal API, .NET 10) + EF Core + PostgreSQL** i `server/`, se `docs/backend.md`.
+- Backend: **WordPress-plugin (PHP 8.1+, WordPress REST API, egne tabeller i MySQL)** i
+  `plugin/jarlsberg-rombooking/`, se `docs/backend.md`. Kjøres lokalt med `@wordpress/env` (Docker, Xdebug).
   All datatilgang i frontend går gjennom grensesnitt i `src/api/`, med en in-memory mock (`src/api/mock/`) basert på
   testdataene i prototypen. Frontend bygges mot mocken til backend-fasen; ikke finn opp endepunkter utenom det
-  `docs/backend.md` og OpenAPI-kontrakten beskriver.
+  `docs/backend.md` og grensesnittene i `src/api/` beskriver.
 
 ## Regler
 
@@ -53,7 +54,7 @@ Er spesifikasjonen og prototypen uenige, gjelder spesifikasjonen. Spør heller e
 
 - Én fase (eller del av fase) per branch og pull request. Små, beskrivende commits.
 - Før du sier at noe er ferdig: `npm run lint`, `npm run typecheck`, `npm run test` skal være grønne. Endringer i
-  `server/`: også `dotnet build`, `dotnet test` og `dotnet format --verify-no-changes`.
+  `plugin/`: også `composer lint` og `composer test`.
 - Skriv tester for domenelogikk og for akseptansekriteriene i `docs/plan.md`.
 - Mappestruktur:
   ```
@@ -64,5 +65,5 @@ Er spesifikasjonen og prototypen uenige, gjelder spesifikasjonen. Spør heller e
     features/       booking-mobile/, booking-desktop/, my-bookings/, manager/, admin/
     locales/nb.json
     router/  stores/  styles/
-  server/           .NET-backend (se docs/backend.md)
+  plugin/           WordPress-pluginen (se docs/backend.md)
   ```

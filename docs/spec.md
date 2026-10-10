@@ -1,12 +1,18 @@
 # Room Booking App – Feature Specification
 
-Version: draft 2, 2026-10-08
+Version: draft 3, 2026-10-10
 
-A standalone web app where people book rooms at **Jarlsberg**, and room managers approve, move and cancel bookings.
+A web app where people book rooms at **Jarlsberg**, and room managers approve, move and cancel bookings.
 Jarlsberg is a conference centre in daily use; youth groups and other activities use it in the evenings and at
-weekends, and the two often overlap. The app replaces the WordPress plugin and keeps every feature the plugin proved
-out (phases 0–9), without depending on a WordPress site or theme. This document describes features only, not
-technology.
+weekends, and the two often overlap. The app is delivered as a **WordPress plugin** on the church's existing WordPress
+site. It replaces the earlier plugin and keeps every feature that plugin proved out (phases 0–9). It runs on its own
+full-screen page on the site and does not depend on the site's theme. This document describes features only; how the
+plugin is built is in `backend.md`.
+
+## Changes since draft 2
+
+- Delivered as a WordPress plugin on the existing site instead of a standalone app with its own hosting (intro, §11).
+- Sign-in is the site's existing login (§11).
 
 ## Changes since draft 1
 
@@ -312,8 +318,11 @@ Managers see two groups: their own (*Book*, *My bookings*) and **Administration*
 
 ## 11. Sign-in and accounts
 
-- Sign-in uses the church's existing login; members never create a separate account or password.
-- Membership and mobile number are read from the sign-in where available; a missing number is asked for once.
+- Sign-in is the WordPress site's existing login, which uses the church's login; members never create a separate
+  account or password for room booking.
+- Membership and mobile number are read from the signed-in user where available; a missing number is asked for once.
+- Members, conference coordinators, room managers and administrators are WordPress users. Room booking roles are
+  separate from WordPress roles, so being a room manager gives no access to edit the website.
 - The member register (member API) is used to find people for restricted rooms.
 - The app is in Norwegian (bokmål), with the text ready to translate.
 
@@ -345,7 +354,8 @@ Managers see two groups: their own (*Book*, *My bookings*) and **Administration*
 
 1. Which SMS provider, and should automatic approvals also send an SMS?
 2. Is 48 hours the right default reply deadline for proposals?
-3. Which sign-in claim holds the mobile number, and is it always available?
+3. Which login plugin does the WordPress site use, where on the user are membership and mobile number stored, and are
+   they always available?
 4. Should managers be able to manage only some rooms or only one part?
 5. Should managers be notified when a member cancels or skips a date?
 6. Should any of the out-of-scope items (calendar feed, reminders) move into v1?
@@ -354,3 +364,4 @@ Managers see two groups: their own (*Book*, *My bookings*) and **Administration*
 9. Which fields does the member API return, and can it be searched by phone number?
 10. Is the list of booking types right, and should types later affect approval, priority or reporting?
 11. Should a whole-part request be split into one request per room, so managers can approve rooms separately?
+12. Which PHP and MySQL versions does the site's host run, and does it allow a real cron job?
