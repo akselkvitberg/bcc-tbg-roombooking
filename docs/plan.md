@@ -125,7 +125,9 @@ samme komponent fra ulike steg).
 **Akseptanse**
 - `plugin/jarlsberg-rombooking/` med Domain, Data, Rest, Jobs og Sms som beskrevet i `docs/backend.md`;
   `composer lint` og `composer test` er grønne.
-- `.wp-env.json` starter WordPress lokalt med pluginen aktivert, testbrukere for hver rolle og Xdebug (`--xdebug`).
+- `.wp-env.json` starter WordPress lokalt med pluginen aktivert og Xdebug (`--xdebug`). Dev-innlogging med rollevalg.
+- `CurrentPerson` leser `personUid`, navn og medlemskap fra BCC Logins token; roller fra `rb_person_role`. Testet med
+  to personer på samme WordPress-bruker.
 - Tabeller via `dbDelta` med skjemaversjon. Bekrefting av bookinger låser rommet i en transaksjon; en test viser at
   to samtidige bekreftelser av samme tid gir én booking og én `409`.
 - Domeneregler portert fra `src/domain/availability.ts`, med testene speilet i PHPUnit.
@@ -143,7 +145,7 @@ samme komponent fra ulike steg).
 
 ## Etter fase 7
 
-- Koble medlemskap og mobilnummer fra nettstedets innlogging, medlems-API og SMS-leverandør (spec §14).
+- Koble mobilnummer og medlemssøk mot Core API, og SMS-leverandør (spec §14).
 - Installer pluginen på nettstedet og sett opp ekte cron hos vertskapet.
 - Erstatt eksempelkartet med ekte plantegning (spec §14 spm. 8).
 - Playwright-tester for: booke en kveld på mobil, gjentakende booking med hoppede datoer på desktop, godkjenne en

@@ -12,7 +12,7 @@ plugin is built is in `backend.md`.
 ## Changes since draft 2
 
 - Delivered as a WordPress plugin on the existing site instead of a standalone app with its own hosting (intro, §11).
-- Sign-in is the site's existing login (§11).
+- Sign-in is the site's existing BCC Login; people are identified by their BCC person id (§11).
 
 ## Changes since draft 1
 
@@ -318,11 +318,12 @@ Managers see two groups: their own (*Book*, *My bookings*) and **Administration*
 
 ## 11. Sign-in and accounts
 
-- Sign-in is the WordPress site's existing login, which uses the church's login; members never create a separate
-  account or password for room booking.
-- Membership and mobile number are read from the signed-in user where available; a missing number is asked for once.
-- Members, conference coordinators, room managers and administrators are WordPress users. Room booking roles are
-  separate from WordPress roles, so being a room manager gives no access to edit the website.
+- Sign-in is the WordPress site's existing BCC Login; members never create a separate account or password for room
+  booking.
+- A person is identified by their BCC person id from the sign-in, not by a WordPress user account (members may share
+  one WordPress account on the site).
+- Membership is read from the sign-in. The mobile number is asked for once if the sign-in does not provide it.
+- Room booking roles are separate from WordPress roles, so being a room manager gives no access to edit the website.
 - The member register (member API) is used to find people for restricted rooms.
 - The app is in Norwegian (bokmål), with the text ready to translate.
 
@@ -354,8 +355,7 @@ Managers see two groups: their own (*Book*, *My bookings*) and **Administration*
 
 1. Which SMS provider, and should automatic approvals also send an SMS?
 2. Is 48 hours the right default reply deadline for proposals?
-3. Which login plugin does the WordPress site use, where on the user are membership and mobile number stored, and are
-   they always available?
+3. Can the mobile number be read from BCC's Core API for the signed-in person, or must the app always ask for it?
 4. Should managers be able to manage only some rooms or only one part?
 5. Should managers be notified when a member cancels or skips a date?
 6. Should any of the out-of-scope items (calendar feed, reminders) move into v1?

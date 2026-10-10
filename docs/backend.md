@@ -12,8 +12,8 @@ fortsatt mot mock-API først (se `plan.md`); backend kobles på uten å endre sk
 
 - **Ingen ekstra hosting.** Nettstedet finnes og driftes allerede. En egen tjeneste med database ville kostet penger
   og drift hver måned for ett senter med lav trafikk.
-- **Innlogging finnes.** Brukerne logger allerede inn på nettstedet med kirkens innlogging; pluginen bruker
-  WordPress-brukeren og trenger ingen egen tokenvalidering.
+- **Innlogging finnes.** Brukerne logger allerede inn på nettstedet med BCC Login; pluginen leser hvem personen er fra
+  innloggingen og trenger ingen egen tokenvalidering.
 - **Pluginen har vært i bruk før.** Funksjonene i spesifikasjonen er prøvd ut i den forrige pluginen (fase 0–9).
 - **Lokal feilsøking løses med `@wordpress/env`** (Docker) med Xdebug, i stedet for en manuell WordPress-installasjon
   på Windows. Det var grunnen til at vi gikk bort fra WordPress sist.
@@ -61,10 +61,12 @@ Frontend blir liggende i roten (`src/`, `package.json`) som i `CLAUDE.md`. `npm 
 
 ### Data
 
-- Egne tabeller med WordPress-prefiks (`{prefix}rb_room`, `rb_booking`, `rb_booking_group`, `rb_series`,
+- Egne tabeller med WordPress-prefiks (`{prefix}rb_person`, `rb_person_role`, `rb_room`, `rb_booking`, `rb_booking_group`, `rb_series`,
   `rb_proposal`, `rb_decision`, `rb_template`, `rb_closure`, `rb_room_access`, `rb_booking_type`, `rb_sms_log`).
   Tabellene følger `datamodell.md`. Ikke custom post types: overlappspørringer og indekser trenger egne kolonner.
-- Medlemmer er WordPress-brukere; `memberId` er `user_id`.
+- Personer identifiseres med `personUid` fra BCC-innloggingen, ikke WordPress-brukerens id (se «Innlogging og roller»).
+  `memberId` er `personUid`. Tabellen `rb_person` (`person_uid`, navn, e-post, mobilnummer, sist sett) fylles ved
+  første besøk og oppdateres fra tokenet.
 - Id-er er `BIGINT UNSIGNED AUTO_INCREMENT`; API-et sender dem som strenger, så `Id = string` i frontend gjelder fortsatt.
 - Tidspunkt lagres som `DATETIME` i UTC. Omregning til Europe/Oslo skjer i kanten (API og UI) med
   `DateTimeImmutable` og `DateTimeZone('Europe/Oslo')`, uavhengig av nettstedets tidssoneinnstilling.
@@ -104,16 +106,33 @@ romansvarlig (spec §8.1). Integrasjonstester kjører to samtidige bekreftelser 
 
 ### Innlogging og roller
 
-- Innlogging er nettstedets eksisterende innlogging (kirkens innlogging via plugin på nettstedet). Pluginen bruker
-  `is_user_logged_in()` og `wp_get_current_user()`.
-- Medlemskap og mobilnummer leses fra brukerdata som innloggingen legger inn. Hvor det ligger er åpent spørsmål
-  (spec §14 spm. 3); pluginen leser det gjennom filtrene `jarlsberg_rombooking_is_member` og
-  `jarlsberg_rombooking_member_phone`, så det kan kobles til uten å endre koden. Mobilnummer som brukeren oppgir selv
-  lagres i user meta.
-- Roller er egne capabilities på WordPress-brukeren: `rb_conference`, `rb_manage_bookings`, `rb_admin`. De gis av
-  admin i pluginens admin-skjerm (spec §2). WordPress-administratorer har alle.
-- Lokal utvikling: `wp-env` med testbrukere for hver rolle (medlem, konferanse, romansvarlig, admin, ikke medlem),
-  opprettet av et oppsettskript.
+Nettstedet bruker **BCC Login** (`bcc-code/bcc-wp`, `plugins/bcc-login`). Det styrer hvordan vi vet hvem brukeren er:
+
+- **WordPress-brukeren er ikke personen.** Med standardoppsettet logger BCC Login alle medlemmer inn som én felles
+  WordPress-bruker (`bcc-login-member`), og andre med medlemskap som `bcc-login-subscriber`. Egne WordPress-brukere
+  per person finnes bare hvis innstillingen «opprett manglende brukere» er på. Derfor brukes aldri
+  `get_current_user_id()` eller capabilities til å identifisere en person eller gi roller.
+- **Personen leses fra tokenet.** BCC Login lagrer ID-tokenet i en transient (`oidc_id_token_{id}`), der `{id}` står i
+  den httpOnly-informasjonskapselen `oidc_token_id`. Tokenet er validert av BCC Login ved innlogging. Pluginen leser
+  claims derfra bak et eget grensesnitt (`CurrentPerson`), så bare én klasse må endres om BCC Login endrer seg:
+  - `https://login.bcc.no/claims/personUid` → `memberId`,
+  - `name`, `email`,
+  - medlemskap: samme regel som BCC Login bruker for synlighetsnivå «medlem» (medlemsorganisasjons-claim lik
+    nettstedets organisasjon). `hasMembership` uten riktig organisasjon gir skjermen «ikke medlem» (spec §2).
+- Mangler transienten (utløpt), er brukeren logget ut for oss: API-et svarer `401`, og appen sender brukeren til
+  BCC Logins innlogging/`/bcc-login/refresh-login`.
+- **Mobilnummer** er ikke i tokenet med standard scope (`email openid profile church`). Til medlems-API-et er avklart
+  (spec §14 spm. 3 og 9) spør appen én gang og lagrer nummeret i `rb_person`.
+- **Roller** (konferanse, romansvarlig, admin) lagres i `rb_person_role` per `personUid` og gis av admin i appen
+  (spec §2). WordPress-administratorer (individuelle brukere med `manage_options`) kan alltid åpne admin-skjermen i
+  wp-admin og gi den første admin-rollen.
+- **Begrensede rom** gis til personer (`personUid`). BCC Login har en klient mot Core API med
+  `checkGroupMemberships`; tilgang via BCC-grupper kan legges til senere uten å endre modellen.
+- **Ingen hurtigbuffer.** Alle medlemmer deler samme WordPress-bruker, så en sidebuffer kan vise én persons data til en
+  annen. REST-svar sendes med `Cache-Control: private, no-store`, og appsiden ekskluderes fra sidebuffer.
+- Nonce (`X-WP-Nonce`) beskytter fortsatt mot CSRF; den er knyttet til innloggingsøkten, ikke til personen.
+- Lokal utvikling: BCC Login er ikke med i `wp-env`. I utvikling byttes `CurrentPerson` ut med en dev-implementasjon
+  med rollevalg (medlem, konferanse, romansvarlig, admin, ikke medlem), tilsvarende mock-innloggingen i fase 1.
 
 ### Domenelogikk
 
@@ -150,7 +169,9 @@ romansvarlig (spec §8.1). Integrasjonstester kjører to samtidige bekreftelser 
 
 ## Åpne punkter som påvirker backend
 
-- Hvilken innloggingsplugin nettstedet bruker, og hvor medlemskap og mobilnummer ligger på brukeren – spec §14 spm. 3.
+- Hvilken medlemsorganisasjon og innstillinger BCC Login har på nettstedet (felles bruker eller én bruker per person).
+- Mobilnummer: fra Core API (krever scope for personer) eller spurt i appen – spec §14 spm. 3.
 - Hvilke felter medlems-API-et returnerer og hvordan det søkes – spec §14 spm. 9.
-- SMS-leverandør – spec §14 spm. 1.
+- SMS-leverandør – spec §14 spm. 1. BCC har en varslingstjeneste (brukt av BCC Login for gruppevarsler); sjekk om den
+  kan sende SMS til én person.
 - PHP- og MySQL-versjon og om ekte cron er tilgjengelig hos nettstedets vertskap.
