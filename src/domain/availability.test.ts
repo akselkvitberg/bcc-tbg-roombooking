@@ -1,8 +1,21 @@
 import { describe, it, expect } from 'vitest'
 import {
-  slotToTime, timeToSlot, slotStatus, daySlots, analyseWindow, classifyRoom, availabilityLabelNb,
-  defaultEndForClick, addDays, isoWeekday, isoWeek, occurrences, evaluateOccurrences, bookingOutcome,
-  type SlotItem, type SlotStatus,
+  slotToTime,
+  timeToSlot,
+  slotStatus,
+  daySlots,
+  analyseWindow,
+  classifyRoom,
+  availabilityLabelNb,
+  defaultEndForClick,
+  addDays,
+  isoWeekday,
+  isoWeek,
+  occurrences,
+  evaluateOccurrences,
+  bookingOutcome,
+  type SlotItem,
+  type SlotStatus,
 } from './availability'
 
 const allDay = { open: 0, close: 28 }
@@ -19,7 +32,10 @@ describe('tid', () => {
 
 describe('slotStatus', () => {
   it('sterkeste status vinner', () => {
-    const items: SlotItem[] = [{ start: 0, end: 10, status: 'req' }, { start: 4, end: 6, status: 'busy' }]
+    const items: SlotItem[] = [
+      { start: 0, end: 10, status: 'req' },
+      { start: 4, end: 6, status: 'busy' },
+    ]
     expect(slotStatus(allDay, items, 2)).toBe('req')
     expect(slotStatus(allDay, items, 5)).toBe('busy')
     expect(slotStatus(allDay, items, 12)).toBe('free')
@@ -32,7 +48,10 @@ describe('slotStatus', () => {
 
 describe('analyseWindow og classifyRoom', () => {
   // Hovedsalen i prototypen: konferanse 08–17, forespurt 19–22
-  const hovedsalen = daySlots(allDay, [{ start: 0, end: 18, status: 'busy' }, { start: 22, end: 28, status: 'req' }])
+  const hovedsalen = daySlots(allDay, [
+    { start: 0, end: 18, status: 'busy' },
+    { start: 22, end: 28, status: 'req' },
+  ])
   const kveld: [number, number] = [18, 28]
 
   it('finner lengste ledige vindu', () => {
@@ -87,10 +106,20 @@ describe('datoer', () => {
 
 describe('occurrences', () => {
   it('ukentlig med antall', () => {
-    expect(occurrences('2026-10-09', 'weekly', { count: 4 })).toEqual(['2026-10-09', '2026-10-16', '2026-10-23', '2026-10-30'])
+    expect(occurrences('2026-10-09', 'weekly', { count: 4 })).toEqual([
+      '2026-10-09',
+      '2026-10-16',
+      '2026-10-23',
+      '2026-10-30',
+    ])
   })
   it('annenhver uke til dato', () => {
-    expect(occurrences('2026-10-10', 'biweekly', { until: '2026-11-21' })).toEqual(['2026-10-10', '2026-10-24', '2026-11-07', '2026-11-21'])
+    expect(occurrences('2026-10-10', 'biweekly', { until: '2026-11-21' })).toEqual([
+      '2026-10-10',
+      '2026-10-24',
+      '2026-11-07',
+      '2026-11-21',
+    ])
   })
   it('månedlig hopper over måneder uten datoen', () => {
     expect(occurrences('2026-10-31', 'monthly', { count: 3 })).toEqual(['2026-10-31', '2026-12-31', '2027-01-31'])
@@ -114,33 +143,43 @@ describe('evaluateOccurrences og bookingOutcome', () => {
       '2026-11-06': daySlots(allDay, [{ start: 0, end: 28, status: 'closed' }]), // AK-bygget stengt
     },
   }
-  const slotsFor = (room: string, date: string) => slots[room]?.[date] ?? daySlots(room === 'ungdomskafeen' ? { open: 16, close: 28 } : allDay, [])
+  const slotsFor = (room: string, date: string) =>
+    slots[room]?.[date] ?? daySlots(room === 'ungdomskafeen' ? { open: 16, close: 28 } : allDay, [])
 
   it('markerer konflikt, stengt og hoppet over', () => {
     const r = evaluateOccurrences(dates, ['akSalen', 'ungdomskafeen'], slotsFor, 18, 28, new Set(['2026-10-30']))
-    expect(r.map(o => o.status)).toEqual(['free', 'free', 'conflict', 'free', 'closed'])
+    expect(r.map((o) => o.status)).toEqual(['free', 'free', 'conflict', 'free', 'closed'])
     expect(r[2]).toMatchObject({ roomId: 'akSalen', from: 18 })
-    expect(r.filter(o => o.included).map(o => o.date)).toEqual(['2026-10-09', '2026-10-16', '2026-10-23'])
+    expect(r.filter((o) => o.included).map((o) => o.date)).toEqual(['2026-10-09', '2026-10-16', '2026-10-23'])
   })
 
   it('utfall: manuelt rom + konflikt går til romansvarlig', () => {
     const occ = evaluateOccurrences(dates, ['akSalen'], slotsFor, 18, 28)
-    expect(bookingOutcome({ rooms: [{ approval: 'manual' }], wholePart: false, occurrences: occ }))
-      .toEqual({ kind: 'needs-approval', reasons: ['manual-room', 'conflict'], conflicts: 1 })
+    expect(bookingOutcome({ rooms: [{ approval: 'manual' }], wholePart: false, occurrences: occ })).toEqual({
+      kind: 'needs-approval',
+      reasons: ['manual-room', 'conflict'],
+      conflicts: 1,
+    })
   })
 
   it('utfall: automatisk og ledig bekreftes', () => {
     const occ = evaluateOccurrences(['2026-10-09'], ['ungdomskafeen'], slotsFor, 18, 28)
-    expect(bookingOutcome({ rooms: [{ approval: 'automatic' }], wholePart: false, occurrences: occ })).toEqual({ kind: 'confirmed' })
+    expect(bookingOutcome({ rooms: [{ approval: 'automatic' }], wholePart: false, occurrences: occ })).toEqual({
+      kind: 'confirmed',
+    })
   })
 
   it('utfall: hele bygget går alltid til godkjenning', () => {
     const occ = evaluateOccurrences(['2026-10-09'], ['ungdomskafeen'], slotsFor, 18, 28)
-    expect(bookingOutcome({ rooms: [{ approval: 'automatic' }], wholePart: true, occurrences: occ }).kind).toBe('needs-approval')
+    expect(bookingOutcome({ rooms: [{ approval: 'automatic' }], wholePart: true, occurrences: occ }).kind).toBe(
+      'needs-approval',
+    )
   })
 
   it('utfall: ingenting å sende når alt er valgt bort', () => {
     const occ = evaluateOccurrences(['2026-10-09'], ['akSalen'], slotsFor, 18, 28, new Set(['2026-10-09']))
-    expect(bookingOutcome({ rooms: [{ approval: 'manual' }], wholePart: false, occurrences: occ })).toEqual({ kind: 'nothing-to-send' })
+    expect(bookingOutcome({ rooms: [{ approval: 'manual' }], wholePart: false, occurrences: occ })).toEqual({
+      kind: 'nothing-to-send',
+    })
   })
 })

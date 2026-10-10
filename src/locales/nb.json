@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "Jarlsberg rombooking",
+    "mainMenu": "Hovedmeny",
+    "adminMenu": "Administrasjon",
+    "themeToggle": "Bytt mellom lys og mørk modus"
+  },
+  "nav": {
+    "book": "Book",
+    "dayView": "Dagsoversikt",
+    "map": "Kart",
+    "myBookings": "Mine bookinger",
+    "requests": "Forespørsler",
+    "allBookings": "Alle bookinger",
+    "roomsAndAccess": "Rom og tilgang"
+  },
+  "pages": {
+    "book": "Book rom",
+    "room": "Rom og tid",
+    "details": "Detaljer",
+    "receipt": "Kvittering",
+    "wholePart": "Book hele bygget",
+    "map": "Kart",
+    "dayView": "Dagsoversikt",
+    "myBookings": "Mine bookinger",
+    "requests": "Forespørsler",
+    "allBookings": "Alle bookinger",
+    "roomsAndAccess": "Rom og tilgang",
+    "demo": "Komponenttest",
+    "notFound": "Fant ikke siden"
+  },
+  "placeholder": {
+    "notBuilt": "Denne skjermen er ikke bygd ennå.",
+    "toFrontPage": "Til forsiden"
+  },
+  "demo": {
+    "intro": "Sjekk at BCC-komponentene vises riktig i lys og mørk modus.",
+    "primary": "Primær",
+    "secondary": "Sekundær",
+    "text": "Tekst",
+    "danger": "Avbestill",
+    "confirmedTitle": "Bekreftes med en gang",
+    "confirmedBody": "Rommet er ledig og godkjennes automatisk.",
+    "managerTitle": "Går til romansvarlig",
+    "managerBody": "Én eller flere datoer overlapper en annen booking.",
+    "errorTitle": "Kan ikke sendes",
+    "errorBody": "Tiden er utenfor rommets åpningstid."
+  }
+}

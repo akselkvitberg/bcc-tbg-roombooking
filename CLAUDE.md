@@ -14,7 +14,7 @@ ledere («power users») og romansvarlige/admin.
 | `docs/datamodell.md` | Domenemodellen (TypeScript-typer) |
 | `docs/backend.md` | Backend-beslutning: ASP.NET Core + EF Core + PostgreSQL, arkitektur og drift |
 | `docs/design/*.dc.html` | Klikkbar prototype (fasit for utseende og flyt). Se `docs/design/README.md` |
-| `reference/availability.ts` | Ferdig, testet logikk for status, ledig tid, konflikter og gjentakelser. Flytt inn i `src/domain/` og bruk den |
+| `src/domain/availability.ts` | Ferdig, testet logikk for status, ledig tid, konflikter og gjentakelser. Bruk den |
 
 Er spesifikasjonen og prototypen uenige, gjelder spesifikasjonen. Spør heller enn å gjette når begge er uklare.
 
@@ -55,6 +55,8 @@ Er spesifikasjonen og prototypen uenige, gjelder spesifikasjonen. Spør heller e
 - Før du sier at noe er ferdig: `npm run lint`, `npm run typecheck`, `npm run test` skal være grønne. Endringer i
   `server/`: også `dotnet build`, `dotnet test` og `dotnet format --verify-no-changes`.
 - Skriv tester for domenelogikk og for akseptansekriteriene i `docs/plan.md`.
+- Sidetittelen settes i rutens `meta.titleKey` og vises av `BccTopNavigation` som sidens `h1`. Sidene lager ikke
+  egen `h1`.
 - Mappestruktur:
   ```
   src/

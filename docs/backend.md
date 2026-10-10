@@ -73,7 +73,7 @@ Frontend blir liggende i roten (`src/`, `package.json`) som i `CLAUDE.md`.
 
 ### Domenelogikk
 
-- `Jarlsberg.Rombooking.Domain` porterer reglene serveren må avgjøre fra `reference/availability.ts`: status med
+- `Jarlsberg.Rombooking.Domain` porterer reglene serveren må avgjøre fra `src/domain/availability.ts`: status med
   prioritet, overlapp/konflikt, utfall (bekreftes / går til romansvarlig), datoer i serie (maks 26, ett år frem,
   måneder uten datoen hoppes over).
 - Testene i `availability.test.ts` speiles som xUnit-tester, så frontend og backend er enige.
