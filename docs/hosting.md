@@ -44,6 +44,7 @@ kostnaden.
 | # | Oppsett | Region | Ca. pris/mnd | Drift |
 | --- | --- | --- | --- | --- |
 | A | **Google Cloud Run** + Cloud Scheduler + **Neon** Postgres | Finland + Frankfurt | **$0–5** (Cloud Run og Scheduler innenfor gratiskvote; Neon gratis eller Launch) | Lav |
+| A2 | **Google Cloud Run** + Cloud Scheduler + **Cloud SQL** for PostgreSQL db-f1-micro (alt i GCP) | Finland eller Stockholm | **≈ $12–16** (database ≈ $10–14 + 10 GB SSD ≈ $2) | Lav |
 | B | **Azure Container Apps** (skalerer til null) + Container Apps Job + PostgreSQL Flexible B1ms | Norway East | **≈ $20** (app innenfor gratiskvote; database ≈ $16 + lagring ≈ $4) | Lav |
 | C | **Fly.io** med `auto_stop_machines` + **Neon**, cron via GitHub Actions | Stockholm + Frankfurt | **$0–5** | Lav–middels |
 
@@ -67,6 +68,16 @@ Neon gratis (0,5 GB, sover etter 5 min) holder lenge for ett senter, men har bar
 nattlig `pg_dump` eller gå til Launch. To leverandører, og database i en annen region enn appen (Finland–Frankfurt,
 noen titalls ms per spørring).
 
+**A2. Alt i GCP (Cloud Run + Cloud SQL)** – én leverandør, én faktura og én tilgangsmodell:
+- Cloud Run kobler til Cloud SQL med innebygd connector (Unix-socket, ingen VPC eller offentlig database-IP).
+- Cloud Scheduler kaller jobbendepunktene med OIDC-token fra en tjenestekonto, og Cloud Run krever IAM på
+  `/internal/jobs/*` – ingen delt hemmelighet. Nattlig backup trengs ikke som egen jobb: Cloud SQL har automatisk
+  daglig backup og point-in-time recovery (7 dager).
+- Hemmeligheter (OIDC-klient, SMS-nøkkel) i Secret Manager; image i Artifact Registry (0,5 GB gratis).
+- Ulemper: Cloud SQL skalerer ikke til null, så databasen koster ≈ $12–16 uansett. Shared-core-maskinene
+  (db-f1-micro, db-g1-small) har ikke SLA – db-g1-small (1,7 GB, ≈ $28) eller en dedikert kjerne hvis det trengs.
+  GCP har ikke region i Norge; Finland (europe-north1) eller Stockholm (europe-north2 – sjekk at Cloud Run finnes der).
+
 **B. Azure Container Apps** – samme modell i Norway East, og alt hos én leverandør. Postgres Flexible kan ikke skalere
 til null, så databasen koster ≈ $20 uansett. Naturlig dersom BCC/kirken allerede har en Azure-tenant (felles
 fakturering, tilgangsstyring, evt. nonprofit-kreditter).
@@ -86,8 +97,9 @@ døgnet. Railway er billigst og passer for test/staging; DigitalOcean og Render 
 
 1. **Spør først om BCC har Azure (eller annen plattform) vi skal bruke.** Har de det, velg **B: Azure Container Apps +
    PostgreSQL Flexible B1ms i Norway East** (≈ $20/mnd, mulig dekket av eksisterende avtale, data i Norge).
-2. Ellers: **A: Cloud Run + Cloud Scheduler + Neon** (≈ $0–5/mnd), med nattlig `pg_dump` som egen jobb. Gå til
-   Neon Launch hvis gratisgrensene eller den korte gjenopprettingen blir et problem.
+2. Ellers: **GCP med Cloud Run + Cloud Scheduler.** Som database er **Cloud SQL (A2, ≈ $12–16/mnd)** det trygge
+   valget – alt hos én leverandør, backup og PITR inkludert. **Neon (A, ≈ $0–5/mnd)** er billigere, men krever egen
+   nattlig `pg_dump` og en ekstra leverandør.
 3. Er kald start uakseptabel for medlemmene, velg én instans alltid på i A/B (≈ $5–10 ekstra) eller **DigitalOcean**
    (≈ $20/mnd).
 
@@ -106,7 +118,9 @@ leverandørbytte er en `pg_dump`/`pg_restore`, ny deploy og ny cron.
   [infratally.com](https://infratally.com/articles/railway-vs-render-vs-fly-vs-digitalocean-paas-2026/)
 - Fly.io: [fly.io/docs/about/pricing](https://fly.io/docs/about/pricing/), [temps.sh](https://temps.sh/blog/fly-io-pricing-2026)
 - Neon: [jetadmin.io](https://www.jetadmin.io/blog/neon-pricing/)
-- Google Cloud: [Cloud Run](https://cloud.google.com/run/pricing), [Cloud Scheduler](https://cloud.google.com/scheduler/pricing)
+- Google Cloud: [Cloud Run](https://cloud.google.com/run/pricing), [Cloud Scheduler](https://cloud.google.com/scheduler/pricing),
+  [Cloud SQL-priser](https://www.bytebase.com/dbcost/cloudsql-pricing/), [db-f1-micro i Stockholm](https://sparecores.com/database/gcp/db-f1-micro),
+  [Stockholm-regionen](https://www.datacenterdynamics.com/en/news/google-launches-cloud-region-in-sweden/)
 - Azure: [PostgreSQL Flexible B1ms](https://www.bytebase.com/dbcost/azure-flexible/instance/B1ms/),
   [Container Apps](https://azure.microsoft.com/en-us/pricing/details/container-apps/),
   [App Service B1](https://learn.microsoft.com/en-us/answers/questions/1328931/how-azure-cost-for-an-appservice)

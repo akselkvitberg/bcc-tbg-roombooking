@@ -103,7 +103,7 @@ Frontend blir liggende i roten (`src/`, `package.json`) som i `CLAUDE.md`.
 
 - Ett Docker-image, bygget i flere steg: `npm run build` → `dotnet publish`, med `dist/` servert som statiske filer.
 - PostgreSQL ved siden av. Alternativer og kostnad i `hosting.md`; foreløpig anbefaling er Azure Container Apps i
-  Norway East hvis BCC har Azure, ellers Cloud Run + Neon. Begge skalerer til null med jobbene som planlagte kall.
+  Norway East hvis BCC har Azure, ellers GCP (Cloud Run + Cloud SQL eller Neon). Begge skalerer til null med jobbene som planlagte kall.
 - Migreringer kjøres ved utrulling (`dotnet ef migrations bundle`), ikke automatisk ved oppstart.
 
 ## Åpne punkter som påvirker backend
